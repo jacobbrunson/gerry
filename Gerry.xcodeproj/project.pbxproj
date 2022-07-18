@@ -14,6 +14,8 @@
 		60354A389D09380AB6D2473B /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035442361E9B26D282AA6D8 /* StatusBarController.swift */; };
 		60354AAFE69650A9DC2A3937 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 603540C3D545D8773CA98C11 /* MainMenu.xib */; };
 		60354AC6AEC520AC7128CDCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6035467BD4AB1EDC497F19FD /* Assets.xcassets */; };
+		60354B520E0E0204301AC1A6 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 60354CFCAC57B12EA83F4C48 /* stop.png */; };
+		60354D78C4BBF923C4D34003 /* ScreenCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603548670B9BEB503192F5DB /* ScreenCaptureController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,8 +26,10 @@
 		6035442361E9B26D282AA6D8 /* StatusBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		603546418019998302B6B71C /* Gerry.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Gerry.entitlements; sourceTree = "<group>"; };
 		6035467BD4AB1EDC497F19FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		603548670B9BEB503192F5DB /* ScreenCaptureController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureController.swift; sourceTree = "<group>"; };
 		6035493937EF35CB1E00D39F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		60354967583A11949F444708 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
+		60354CFCAC57B12EA83F4C48 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 				603541C41F32FFD0573D14C3 /* ContentView.swift */,
 				60354967583A11949F444708 /* Info.plist */,
 				603540C3D545D8773CA98C11 /* MainMenu.xib */,
+				60354CFCAC57B12EA83F4C48 /* stop.png */,
+				603548670B9BEB503192F5DB /* ScreenCaptureController.swift */,
 			);
 			path = Gerry;
 			sourceTree = "<group>";
@@ -125,6 +131,7 @@
 				603547190A346E09BFC0A17C /* G.png in Resources */,
 				603547ABE5784AF572DE0037 /* Info.plist in Resources */,
 				60354AAFE69650A9DC2A3937 /* MainMenu.xib in Resources */,
+				60354B520E0E0204301AC1A6 /* stop.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +145,7 @@
 				6035443A6BBC41430D363E7C /* AppDelegate.swift in Sources */,
 				60354A389D09380AB6D2473B /* StatusBarController.swift in Sources */,
 				603545802E5C8676910EF58F /* ContentView.swift in Sources */,
+				60354D78C4BBF923C4D34003 /* ScreenCaptureController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

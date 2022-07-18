@@ -15,7 +15,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBar: StatusBarController?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        print("ssdsd")
         statusBar = StatusBarController.init()
     }
 
