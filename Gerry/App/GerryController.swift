@@ -3,6 +3,8 @@
 //
 
 import Foundation
+import AppKit
+import SwiftUI
 
 class GerryController {
     let screenCaptureController = ScreenCaptureController()
@@ -17,8 +19,11 @@ class GerryController {
                 await self.screenCaptureController.beginRecording()
                 self.transition(to: .recording)
             } else if self.state == .recording {
-                print(await self.screenCaptureController.stopRecording())
+                let videoURL = await self.screenCaptureController.stopRecording()
                 self.transition(to: .saving)
+                DispatchQueue.main.async {
+                    SavingView(videoURL: videoURL).openNewWindow(with: "test")
+                }
             }
         }
     }
