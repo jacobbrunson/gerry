@@ -12,13 +12,9 @@ import SwiftUI
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    var statusBar: StatusBarController?
+    var gerryController: GerryController?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        statusBar = StatusBarController.init()
-    }
-
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        gerryController = GerryController()
     }
 }

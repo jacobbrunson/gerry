@@ -8,27 +8,41 @@ class StatusBarController {
     private var statusBar: NSStatusBar
     private var statusItem: NSStatusItem
 
-    let TEMP = ScreenCaptureController()
+    public var clickHandler: (() async -> ())?
 
     init() {
         statusBar = NSStatusBar.init()
-        // Creating a status bar item having a fixed length
         statusItem = statusBar.statusItem(withLength: 28.0)
 
         if let statusBarButton = statusItem.button {
-            setStatusBarButtonImage(imageLiteralResourceName: "G.png")
+            setStatusBarButtonImage(imageLiteralResourceName: getIconName(.idle))
             statusBarButton.action = #selector(onClick(sender:))
             statusBarButton.target = self
         }
     }
 
-    @objc func onClick(sender: AnyObject)  {
-        print("clicked!")
-        setStatusBarButtonImage(imageLiteralResourceName: "stop.png")
-        Task {
-            await TEMP.beginRecording()
-            try! await Task.sleep(nanoseconds: UInt64(5 * Double(NSEC_PER_SEC)))
-            print(await TEMP.stopRecording())
+    func updateIcon(_ state: GerryState) {
+        setStatusBarButtonImage(imageLiteralResourceName: getIconName(state))
+    }
+
+    private func getIconName(_ state: GerryState) -> String  {
+        switch (state) {
+        case .idle:
+            return "G.png"
+        case .loading:
+            return "G.png"
+        case.recording:
+            return "stop.png"
+        case.saving:
+            return "G.png"
+        }
+    }
+
+    @objc private func onClick(sender: AnyObject)  {
+        if clickHandler != nil {
+            Task {
+                await clickHandler!()
+            }
         }
     }
 
