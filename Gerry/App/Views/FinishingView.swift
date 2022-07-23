@@ -23,7 +23,7 @@ struct FinishingView: View {
 
     var body: some View {
         VStack {
-            PlayerCropperView(player: player)
+            PlayerCropperView(player: player).onAppear { print("play"); player.play(); print("plaedy"); }
             TrimmerView(mediaURL: videoURL, currentTime: currentTime) { t, position in
                 if position == .left {
                     startT = t
