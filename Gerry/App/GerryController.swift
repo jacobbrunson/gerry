@@ -13,6 +13,12 @@ class GerryController {
     var state = GerryState.idle
 
     init() {
+        DispatchQueue.main.async {
+            Task {
+                let display = await self.screenCaptureController.getDisplay()
+                FinishingView(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/0198E00D-1B07-43A8-A252-90CB6C0EE9B1.mp4")!).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height-400))
+            }
+        }
         statusBarController.clickHandler = { [self]
             if self.state == .idle {
                 self.transition(to: .loading)
@@ -20,9 +26,13 @@ class GerryController {
                 self.transition(to: .recording)
             } else if self.state == .recording {
                 let videoURL = await self.screenCaptureController.stopRecording()
+                print(videoURL)
                 self.transition(to: .saving)
                 DispatchQueue.main.async {
-                    SavingView(videoURL: videoURL).openNewWindow(with: "test")
+                    Task {
+                        let display = await self.screenCaptureController.getDisplay()
+                        FinishingView(videoURL: videoURL).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
+                    }
                 }
             }
         }

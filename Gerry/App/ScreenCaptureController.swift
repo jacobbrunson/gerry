@@ -67,7 +67,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         writer?.startWriting()
     }
 
-    private func getDisplay() async -> SCDisplay {
+    public func getDisplay() async -> SCDisplay {
         let content = try! await SCShareableContent.excludingDesktopWindows(false,
                 onScreenWindowsOnly: true)
         return content.displays[0];
