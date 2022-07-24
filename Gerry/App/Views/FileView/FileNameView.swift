@@ -32,7 +32,7 @@ struct FileNameView: View {
                 HighlightTextField(text: $viewModel.fileName)
                 Spacer()
             }
-        }.padding().frame(width: 477)
+        }.padding().frame(width: 400)
     }
 
     @MainActor

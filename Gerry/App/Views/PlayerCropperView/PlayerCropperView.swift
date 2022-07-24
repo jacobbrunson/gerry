@@ -63,6 +63,7 @@ class PlayerCropperViewController: NSViewController {
         cropperView.frame = view.bounds
         cropperView.videoViewport = videoViewport
         cropperView.addTrackingArea(NSTrackingArea(rect: view.bounds, options: [.activeAlways, .mouseMoved], owner: cropperView, userInfo: nil))
+        onSelect?(playerView.frame)
     }
 
     var videoViewport: CGRect {

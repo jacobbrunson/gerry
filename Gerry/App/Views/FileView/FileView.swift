@@ -17,8 +17,8 @@ struct FileView: View {
     var body: some View {
         HStack {
             FileNameView(viewModel: viewModel)
-            FileQualityView()
-            FileSaveView(videoURL: videoURL, outputFolder: viewModel.outputFolder!, name: viewModel.fileName, cropRect: cropRect, startT: startT, endT: endT)
+            FileQualityView(viewModel: viewModel, cropRect: cropRect)
+            FileSaveView(viewModel: viewModel, videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT)
         }
     }
 }

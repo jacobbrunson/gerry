@@ -6,7 +6,7 @@ import Foundation
 import AVFoundation
 
 class GifExporter: Exporter {
-    func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFPS frameRate: CGFloat) async -> URL {
+    func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFrameRate desiredFrameRate: CGFloat) async -> URL {
         print("Exporting gif to", outputFolder.path, fileName)
 
         let asset = AVURLAsset(url: url)
@@ -19,6 +19,7 @@ class GifExporter: Exporter {
 
 
         let totalDuration = asset.duration.seconds
+        let frameRate = min(desiredFrameRate, 30)
         let totalFrames = Int(totalDuration * TimeInterval(frameRate))
 
         let duration = totalDuration * (endT - startT)
