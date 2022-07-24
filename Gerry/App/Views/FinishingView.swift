@@ -32,7 +32,8 @@ struct FinishingView: View {
                 } else {
                     stopT = t
                 }
-            }.frame(height: 50)
+                player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+            }.frame(height: 100)
             HStack {
                 NamingView()
                 QualityView()
