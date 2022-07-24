@@ -103,6 +103,8 @@ class TrimmerViewController: NSViewController {
 
         let generator = AVAssetImageGenerator(asset: asset)
         generator.maximumSize = CGSize(width: width, height: height)
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = .zero
 
         let thumbCount = Int(ceil(timelineView.frame.width / width))
         let times = getTimeValues(count: thumbCount, duration: asset.duration)

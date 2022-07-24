@@ -8,18 +8,20 @@ import AVFoundation
 class GifExporter: Exporter {
     func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFPS frameRate: CGFloat) async -> URL {
         print("Exporting gif to", outputFolder.path, fileName)
-        print(maybeRect)
+
         let asset = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
-        generator.requestedTimeToleranceBefore = CMTime(seconds: 0.05, preferredTimescale: 600)
-        generator.requestedTimeToleranceAfter = CMTime(seconds: 0.05, preferredTimescale: 600)
 
-        let duration: TimeInterval = asset.duration.seconds * (endT - startT)
-        let totalFrames = Int(duration * TimeInterval(frameRate))
-        let delayBetweenFrames: TimeInterval = 1.0 / TimeInterval(frameRate)
 
-        print(url)
-        print("Duration:", duration, frameRate, totalFrames)
+        generator.requestedTimeToleranceBefore = CMTime.zero
+        generator.requestedTimeToleranceAfter = CMTime.zero
+        generator.appliesPreferredTrackTransform = true
+
+
+        let totalDuration = asset.duration.seconds
+        let totalFrames = Int(totalDuration * TimeInterval(frameRate))
+
+        let duration = totalDuration * (endT - startT)
 
 
         var timeValues: [NSValue] = []
@@ -27,6 +29,8 @@ class GifExporter: Exporter {
         let startFrame = Int(CGFloat(totalFrames)*startT)
         let endFrame = Int(CGFloat(totalFrames)*endT)
         let frameCount = endFrame - startFrame
+        let delayBetweenFrames: TimeInterval = 1.0 / TimeInterval(frameRate)
+
         for frameNumber in startFrame ..< endFrame {
             let seconds = TimeInterval(delayBetweenFrames) * TimeInterval(frameNumber)
             let time = CMTime(seconds: seconds, preferredTimescale: Int32(NSEC_PER_SEC))
@@ -60,15 +64,21 @@ class GifExporter: Exporter {
         let startTime = CFAbsoluteTimeGetCurrent()
 
         return try! await withCheckedThrowingContinuation { continuation in
+            var prevFrame: CGImage?
             generator.generateCGImagesAsynchronously(forTimes: timeValues) { (requestedTime, resultingImage, actualTime, result, error) in
                 framesProcessed += 1
 
                 if resultingImage == nil {
                     print("Frame", framesProcessed, "/", frameCount, "failed")
-                    print(error)
+                    print(requestedTime.seconds, actualTime.seconds, result.rawValue, error)
+                    if prevFrame != nil {
+                        CGImageDestinationAddImage(imageDestination, prevFrame!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
+                    }
                 } else {
                     print("Processed frame \(framesProcessed)/\(frameCount) (\(startFrame)-\(endFrame), \(totalFrames) total)")
+                    print(requestedTime.seconds, actualTime.seconds, result.rawValue, error)
                     CGImageDestinationAddImage(imageDestination, resultingImage!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
+                    prevFrame = resultingImage
                 }
 
                 if framesProcessed == frameCount {
