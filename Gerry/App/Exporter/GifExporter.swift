@@ -8,19 +8,26 @@ import AVFoundation
 class GifExporter: Exporter {
     func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFPS frameRate: CGFloat) async -> URL {
         print("Exporting gif to", outputFolder.path, fileName)
+        print(maybeRect)
         let asset = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.requestedTimeToleranceBefore = CMTime(seconds: 0.05, preferredTimescale: 600)
         generator.requestedTimeToleranceAfter = CMTime(seconds: 0.05, preferredTimescale: 600)
 
         let duration: TimeInterval = asset.duration.seconds * (endT - startT)
-        print("Duration:", duration)
         let totalFrames = Int(duration * TimeInterval(frameRate))
         let delayBetweenFrames: TimeInterval = 1.0 / TimeInterval(frameRate)
 
+        print(url)
+        print("Duration:", duration, frameRate, totalFrames)
+
+
         var timeValues: [NSValue] = []
 
-        for frameNumber in 0 ..< totalFrames {
+        let startFrame = Int(CGFloat(totalFrames)*startT)
+        let endFrame = Int(CGFloat(totalFrames)*endT)
+        let frameCount = endFrame - startFrame
+        for frameNumber in startFrame ..< endFrame {
             let seconds = TimeInterval(delayBetweenFrames) * TimeInterval(frameNumber)
             let time = CMTime(seconds: seconds, preferredTimescale: Int32(NSEC_PER_SEC))
             timeValues.append(NSValue(time: time))
@@ -56,13 +63,15 @@ class GifExporter: Exporter {
             generator.generateCGImagesAsynchronously(forTimes: timeValues) { (requestedTime, resultingImage, actualTime, result, error) in
                 framesProcessed += 1
 
-                guard let resultingImage = resultingImage else { print("Frame", framesProcessed, "/", totalFrames, "failed"); return }
+                if resultingImage == nil {
+                    print("Frame", framesProcessed, "/", frameCount, "failed")
+                    print(error)
+                } else {
+                    print("Processed frame \(framesProcessed)/\(frameCount) (\(startFrame)-\(endFrame), \(totalFrames) total)")
+                    CGImageDestinationAddImage(imageDestination, resultingImage!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
+                }
 
-                print("Processed frame", framesProcessed, "/", totalFrames);
-
-                CGImageDestinationAddImage(imageDestination, resultingImage.cropping(to: scaledRect)!, frameProperties as CFDictionary)
-
-                if framesProcessed == totalFrames {
+                if framesProcessed == frameCount {
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
                     print("Done converting to gif. Processed: \(framesProcessed) in \(timeElapsed) s")
                     print("Finalizing...")

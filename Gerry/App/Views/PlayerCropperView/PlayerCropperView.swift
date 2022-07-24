@@ -9,13 +9,28 @@ import AVKit
 
 struct PlayerCropperView: NSViewControllerRepresentable {
     let player: AVPlayer
-    let cropRect: Binding<CGRect?>
+    var cropRect: Binding<CGRect?>
 
     func makeNSViewController(context: Context) -> PlayerCropperViewController {
         let viewController = PlayerCropperViewController()
         viewController.player = player
-        viewController.onSelect = {
-            print("cropped", $0.width, $0.height)
+        viewController.onSelect = { rawRect in
+            let videoViewport = viewController.videoViewport
+
+            let naturalSize = player.currentItem!.asset.tracks[0].naturalSize
+            let scale = naturalSize.width / videoViewport.width
+
+            let x1 = (rawRect.minX - videoViewport.minX) * scale
+            let x2 = (rawRect.maxX - videoViewport.minX) * scale
+            let y1 = (rawRect.minY - videoViewport.minY) * scale
+            let y2 = (rawRect.maxY - videoViewport.minY) * scale
+
+            let minX = min(x1, x2)
+            let maxX = max(x1, x2)
+            let minY = min(y1, y2)
+            let maxY = max(y1, y2)
+
+            cropRect.wrappedValue = CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
         }
         return viewController
     }

@@ -26,7 +26,7 @@ struct FileSaveView: View {
                             startingAt: startT,
                             endingAt: endT,
                             withScale: 1.0,
-                            withFPS: 30
+                            withFPS: 60
                     )
                     print(result)
                 }

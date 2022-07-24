@@ -16,7 +16,7 @@ struct ExportView: View {
     @State private var cropRect: CGRect?
     @State private var currentTime: CMTime = CMTime.zero
     @State private var startT = 0.0
-    @State private var stopT = 1.0
+    @State private var endT = 1.0
 
     init(videoURL: URL) {
         self.videoURL = videoURL
@@ -31,19 +31,19 @@ struct ExportView: View {
                 if position == .left {
                     startT = t
                 } else {
-                    stopT = t
+                    endT = t
                 }
                 player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
             }.frame(height: 100)
-            FileView(videoURL: videoURL, cropRect: cropRect, startT: 0, endT: 1).frame(height: 100).frame(maxWidth: 900)
+            FileView(videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT).frame(height: 100).frame(maxWidth: 900)
         }.onAppear {
             Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in
                 let duration = player.currentItem!.duration.seconds
                 let startTime = startT * duration
-                let stopTime = stopT * duration
+                let endTime = endT * duration
                 let currentTime = player.currentTime()
                 self.currentTime = currentTime
-                if currentTime.seconds >= stopTime {
+                if currentTime.seconds >= endTime {
                     player.seek(to: CMTime(seconds: startTime, preferredTimescale: 1000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
                     player.play()
                 }
