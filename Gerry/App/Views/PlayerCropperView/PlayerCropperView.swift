@@ -37,25 +37,43 @@ class PlayerCropperViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        playerView.frame = view.bounds
+        playerView.frame = videoViewport
         cropperView.frame = view.bounds
-        cropperView.videoSize = player.currentItem!.asset.tracks[0].naturalSize
+        cropperView.videoViewport = videoViewport
         cropperView.addTrackingArea(NSTrackingArea(rect: view.bounds, options: [.activeAlways, .mouseMoved], owner: cropperView, userInfo: nil))
+    }
+
+    var videoViewport: CGRect {
+        let videoSize = player.currentItem!.asset.tracks[0].naturalSize
+        let aspectRatio = videoSize.width / videoSize.height
+        let actualHeight = view.bounds.height
+        let actualWidth = aspectRatio * actualHeight
+
+        let minX = view.bounds.midX - actualWidth / 2
+        let maxX = view.bounds.midX + actualWidth / 2
+        let minY = 0.0
+        let maxY = view.bounds.maxY
+
+        return CGRect(
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+        )
     }
 }
 
-let yellow = CGColor(red: 1, green: 0.8, blue: 0, alpha: 1)
 let lineWidth = 2.0
 let handleWidth = lineWidth * 2
 let handleLength = lineWidth * 9
 
 
 class CropperView: NSView {
-    private var _videoSize = CGSize.zero
-    var videoSize: CGSize {
-        get { _videoSize }
+    private var _videoViewport = CGRect.zero
+    var videoViewport: CGRect {
+        get { _videoViewport }
         set {
-            _videoSize = newValue
+            _videoViewport = newValue
             start = constrainToVideoViewport(CGPoint.zero)
             end = constrainToVideoViewport(CGPoint(x: CGFloat.infinity, y: CGFloat.infinity))
         }
@@ -92,21 +110,7 @@ class CropperView: NSView {
     }
 
     func constrainToVideoViewport(_ point: CGPoint) -> CGPoint {
-        let aspectRatio = videoSize.width / videoSize.height
-        let actualHeight = bounds.height
-        let actualWidth = aspectRatio * actualHeight
-
-        let minX = bounds.midX - actualWidth / 2
-        let maxX = bounds.midX + actualWidth / 2
-        let minY = 0.0
-        let maxY = frame.maxY
-
-        return constrain(point, to: CGRect(
-                x: minX,
-                y: minY,
-                width: maxX - minX,
-                height: maxY - minY
-        ))
+        constrain(point, to: videoViewport)
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -121,35 +125,35 @@ class CropperView: NSView {
 
         context.addRects([
             CGRect(
-                    x: 0,
+                    x: videoViewport.minX,
                     y: displayRect.maxY,
-                    width: frame.width,
-                    height: frame.height - displayRect.maxY
+                    width: videoViewport.width,
+                    height: videoViewport.height - displayRect.maxY
             ),
             CGRect(
                     x: displayRect.maxX,
-                    y: 0,
-                    width: frame.width - displayRect.maxX,
-                    height: frame.height
+                    y: videoViewport.minY,
+                    width: videoViewport.maxX - displayRect.maxX,
+                    height: videoViewport.height
             ),
             CGRect(
-                    x: 0,
-                    y: 0,
-                    width: frame.width,
+                    x: videoViewport.minX,
+                    y: videoViewport.minY,
+                    width: videoViewport.width,
                     height: displayRect.minY
             ),
             CGRect(
-                    x: 0,
-                    y: 0,
-                    width: displayRect.minX,
-                    height: frame.height
+                    x: videoViewport.minX,
+                    y: videoViewport.minY,
+                    width:  displayRect.minX - videoViewport.minX,
+                    height: videoViewport.height
             ),
         ])
         context.setFillColor(red: 0, green: 0, blue: 0, alpha: 0.4)
         context.drawPath(using: .fill)
 
         context.addRect(displayRect)
-        context.setStrokeColor(yellow)
+        context.setStrokeColor(NSColor(named: "Yellow")!.cgColor)
         context.setLineWidth(lineWidth)
         context.drawPath(using: .stroke)
 

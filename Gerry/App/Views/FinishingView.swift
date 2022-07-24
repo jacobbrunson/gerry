@@ -24,6 +24,7 @@ struct FinishingView: View {
     var body: some View {
         VStack {
             PlayerCropperView(player: player).onAppear { print("play"); player.play(); print("plaedy"); }
+            Spacer(minLength: 24)
             TrimmerView(mediaURL: videoURL, currentTime: currentTime) { t, position in
                 if position == .left {
                     startT = t
@@ -32,27 +33,23 @@ struct FinishingView: View {
                 }
             }.frame(height: 50)
             HStack {
-                Divider()
                 NamingView()
-                Divider()
                 QualityView()
-                Divider()
                 SavingView()
-                Divider()
             }.frame(height: 100).frame(maxWidth: 900)
         }.onAppear {
-                    Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in
-                        let duration = player.currentItem!.duration.seconds
-                        let startTime = startT * duration
-                        let stopTime = stopT * duration
-                        let currentTime = player.currentTime()
-                        self.currentTime = currentTime
-                        if currentTime.seconds >= stopTime {
-                            player.seek(to: CMTime(seconds: startTime, preferredTimescale: 1000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
-                            player.play()
-                        }
-                    }
+            Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in
+                let duration = player.currentItem!.duration.seconds
+                let startTime = startT * duration
+                let stopTime = stopT * duration
+                let currentTime = player.currentTime()
+                self.currentTime = currentTime
+                if currentTime.seconds >= stopTime {
+                    player.seek(to: CMTime(seconds: startTime, preferredTimescale: 1000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+                    player.play()
                 }
+            }
+        }.background(VisualEffectBackground(material: NSVisualEffectView.Material.underWindowBackground, blendingMode: .behindWindow, isEmphasized: true))
     }
 }
 
@@ -129,11 +126,48 @@ struct SavingView: View {
         HStack {
             Button(action: {}) {
                 Text("gif")
-            }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color("Yellow"))
+                        .foregroundColor(Color("DarkText"))
+            }.buttonStyle(PlainButtonStyle())
             Button(action: {}) {
                 Text("mp4")
-            }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color("Yellow"))
+                        .foregroundColor(Color("DarkText"))
+            }.buttonStyle(PlainButtonStyle())
         }.padding()
     }
 }
 
+struct VisualEffectBackground: NSViewRepresentable {
+    private let material: NSVisualEffectView.Material
+    private let blendingMode: NSVisualEffectView.BlendingMode
+    private let isEmphasized: Bool
+
+    fileprivate init(
+            material: NSVisualEffectView.Material,
+            blendingMode: NSVisualEffectView.BlendingMode,
+            isEmphasized: Bool) {
+        self.material = material
+        self.blendingMode = blendingMode
+        self.isEmphasized = isEmphasized
+    }
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+
+        // Not certain how necessary this is
+        view.autoresizingMask = [.width, .height]
+
+        return view
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = material
+        nsView.blendingMode = blendingMode
+        nsView.isEmphasized = isEmphasized
+    }
+}

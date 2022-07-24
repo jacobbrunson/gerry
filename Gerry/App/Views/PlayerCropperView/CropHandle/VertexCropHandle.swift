@@ -44,7 +44,7 @@ class VertexCropHandle: CropHandle {
                     height: handleLength * (isTop ? -1 : 1)
             )
         ])
-        context.setFillColor(yellow)
+        context.setFillColor(NSColor(named: "Yellow")!.cgColor)
         context.drawPath(using: .fill)
     }
 

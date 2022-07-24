@@ -45,7 +45,7 @@ class EdgeCropHandle: CropHandle {
                     height: handleWidth
             ))
         }
-        context.setFillColor(yellow)
+        context.setFillColor(NSColor(named: "Yellow")!.cgColor)
         context.drawPath(using: .fill)
     }
 
