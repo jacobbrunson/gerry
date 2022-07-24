@@ -5,6 +5,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import AppKit
 
 struct FinishingView: View {
     let tolerance = CMTime(value: 1, timescale: 1000)
@@ -23,7 +24,7 @@ struct FinishingView: View {
 
     var body: some View {
         VStack {
-            PlayerCropperView(player: player).onAppear { print("play"); player.play(); print("plaedy"); }
+            PlayerCropperView(player: player).onAppear { player.play() }
             Spacer(minLength: 24)
             TrimmerView(mediaURL: videoURL, currentTime: currentTime) { t, position in
                 if position == .left {
@@ -54,43 +55,92 @@ struct FinishingView: View {
 }
 
 
+struct DefaultTextField: View {
+    @Binding var value: String
+    let defaultValue: String
+    let clearDefaultOnFocus: Bool
 
-
-struct NamingView: View {
-    @State private var defaultName: String = UUID().uuidString
-
-    @State private var folder: String = ""
-    @State private var name: String = ""
+    init(value: Binding<String>, defaultValue: String, clearDefaultOnFocus: Bool = true) {
+        self._value = value
+        self.defaultValue = defaultValue
+        self.clearDefaultOnFocus = clearDefaultOnFocus
+    }
 
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        let nameBinding = Binding<String>(get: {
-            name.isEmpty && !isFocused ? defaultName : name
+        let valueBinding = Binding<String>(get: {
+            if !value.isEmpty || (isFocused && clearDefaultOnFocus) {
+                return value
+            }
+            return defaultValue
         }, set: {
             if isFocused {
-                name = $0
+                value = $0
             }
         })
 
-        return VStack {
+        TextField("", text: valueBinding).focused($isFocused).onChange(of: isFocused) { _ in }
+    }
+}
+
+struct NamingView: View {
+    @State private var defaultOutputFolder = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+    @State private var defaultName: String = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
+
+    @State private var outputFolder = UserDefaults.standard.url(forKey: "outputFolder")
+    @State private var name = ""
+
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        let outputFolderBinding = Binding<String>(get: {
+            outputFolder?.path ?? ""
+        }, set: {
+            outputFolder = URL(string: $0)
+        })
+
+        VStack {
             HStack {
                 Text("Output folder").frame(width: 90, alignment: .leading)
-                TextField("", text: $folder)
-                        .frame(width: 260)
-                Button(action: {}) {
+                DefaultTextField(value: outputFolderBinding, defaultValue: defaultOutputFolder.path, clearDefaultOnFocus: false).frame(width: 260)
+                Button(action: {
+                    Task {
+                        outputFolder = await selectFolder()
+                        // Todo: this should be set at a different point in flow
+                        UserDefaults.standard.set(outputFolder, forKey: "outputFolder")
+                    }
+                }) {
                     Text("Browse...")
                 }
                 Spacer()
             }
             HStack {
                 Text("File name").frame(width: 90, alignment: .leading)
-                TextField("", text: nameBinding).frame(width: 120).focused($isFocused).onChange(of: isFocused) { isFocused in
-                    print(isFocused, name, name.isEmpty)
-                }
+                DefaultTextField(value: $name, defaultValue: defaultName).frame(width: 120)
                 Spacer()
             }
         }.padding().frame(width: 477)
+    }
+
+    @MainActor
+    func selectFolder() async -> URL {
+        let folderChooserPoint = CGPoint(x: 0, y: 0)
+        let folderChooserSize = CGSize(width: 500, height: 600)
+        let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
+        let folderPicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
+
+        folderPicker.canChooseDirectories = true
+        folderPicker.canChooseFiles = false
+        folderPicker.allowsMultipleSelection = false
+
+        return await withCheckedContinuation{ continuation in
+            folderPicker.begin { response in
+                if response == .OK && folderPicker.url != nil {
+                    continuation.resume(returning: folderPicker.url!)
+                }
+            }
+        }
     }
 }
 
