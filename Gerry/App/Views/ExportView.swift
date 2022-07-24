@@ -34,7 +34,7 @@ struct ExportView: View {
                 }
                 player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
             }.frame(height: 100)
-            FileView().frame(height: 100).frame(maxWidth: 900)
+            FileView(videoURL: videoURL, cropRect: CGRect.zero, startT: 0, endT: 1).frame(height: 100).frame(maxWidth: 900)
         }.onAppear {
             Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in
                 let duration = player.currentItem!.duration.seconds

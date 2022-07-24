@@ -6,19 +6,17 @@ import Foundation
 import SwiftUI
 
 struct FileNameView: View {
+    @Binding var outputFolder: URL?
+    @Binding var name: String
+
     @State private var defaultOutputFolder = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
     @State private var defaultName: String = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
-
-    @State private var outputFolder = UserDefaults.standard.url(forKey: "outputFolder")
-    @State private var name = ""
-
-    @FocusState private var isFocused: Bool
 
     var body: some View {
         let outputFolderBinding = Binding<String>(get: {
             outputFolder?.path ?? ""
         }, set: {
-            outputFolder = URL(string: $0)
+            outputFolder = URL(string: $0)!
         })
 
         VStack {
