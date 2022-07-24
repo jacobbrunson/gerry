@@ -36,14 +36,20 @@ struct FileSaveView: View {
                         Text("gif").font(.title)
                         Text("30 fps").font(.footnote)
                     }
+                            .frame(width: 66, height: 48)
+                            .background(Color("Yellow"))
                 } else {
-                   Text("gif").font(.title)
+                    Text("gif").font(.title)
+                            .frame(width: 66, height: 48)
+                            .background(Color("Yellow"))
+
                 }
 
             }
-                    .frame(width: 66, height: 48)
-                    .buttonStyle(PlainButtonStyle()).background(Color("Yellow"))
+                    .buttonStyle(PlainButtonStyle())
+                    .cornerRadius(10)
                     .foregroundColor(Color("DarkText"))
+
             Button(action: {
 
             }) {
@@ -52,6 +58,7 @@ struct FileSaveView: View {
                         .frame(width: 66, height: 48)
                         .background(Color("Yellow"))
                         .foregroundColor(Color("DarkText"))
+                        .cornerRadius(10)
             }.buttonStyle(PlainButtonStyle())
         }.padding()
     }
