@@ -13,8 +13,19 @@ extension FileView {
         @Published private var selectedFileName: String?
         @Published private var defaultFileName = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
 
+        private var userDefaultOutputFolder: URL? {
+            guard let bookmarkData = UserDefaults.standard.data(forKey: "outputFolder") else { return nil }
+
+            var bookmarkDataIsStale = false;
+            let url = try? URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, bookmarkDataIsStale: &bookmarkDataIsStale)
+
+            guard !bookmarkDataIsStale else { return nil }
+
+            return url
+        }
+
         var outputFolder: URL? {
-            get { selectedOutputFolder ?? UserDefaults.standard.url(forKey: "outputFolder") ?? defaultOutputFolder }
+            get { selectedOutputFolder ?? userDefaultOutputFolder ?? defaultOutputFolder }
             set { selectedOutputFolder = newValue }
         }
 

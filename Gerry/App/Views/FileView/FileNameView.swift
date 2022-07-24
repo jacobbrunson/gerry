@@ -12,12 +12,15 @@ struct FileNameView: View {
         VStack {
             HStack {
                 Text("Output folder").frame(width: 90, alignment: .leading)
-                HighlightTextField(text: $viewModel.outputFolderPath)
+                TextField("", text: $viewModel.outputFolderPath).disabled(true)
                 Button(action: {
                     Task {
-                        viewModel.outputFolder = await selectFolder()
-                        // Todo: this should be set at a different point in flow
-                        UserDefaults.standard.set(viewModel.outputFolder, forKey: "outputFolder")
+                        let selectedURL =  await selectFolder()
+                        viewModel.outputFolder = selectedURL
+
+                        if let bookmark = try? selectedURL.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) {
+                            UserDefaults.standard.set(bookmark, forKey: "outputFolder")
+                        }
                     }
                 }) {
                     Text("Browse...")
@@ -45,8 +48,8 @@ struct FileNameView: View {
 
         return await withCheckedContinuation{ continuation in
             folderPicker.begin { response in
-                if response == .OK && folderPicker.url != nil {
-                    continuation.resume(returning: folderPicker.url!)
+                if response == .OK {
+                    continuation.resume(returning: folderPicker.urls.first!)
                 }
             }
         }

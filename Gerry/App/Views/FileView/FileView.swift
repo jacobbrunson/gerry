@@ -8,7 +8,7 @@ import AVFoundation
 
 struct FileView: View {
     let videoURL: URL
-    let cropRect: CGRect
+    let cropRect: CGRect?
     let startT: CGFloat
     let endT: CGFloat
 
@@ -18,7 +18,7 @@ struct FileView: View {
         HStack {
             FileNameView(viewModel: viewModel)
             FileQualityView()
-            FileSaveView(videoURL: videoURL, outputFolder: viewModel.outputFolder, name: viewModel.fileName, cropRect: cropRect, startT: startT, endT: endT)
+            FileSaveView(videoURL: videoURL, outputFolder: viewModel.outputFolder!, name: viewModel.fileName, cropRect: cropRect, startT: startT, endT: endT)
         }
     }
 }

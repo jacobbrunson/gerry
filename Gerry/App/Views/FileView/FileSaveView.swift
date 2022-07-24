@@ -8,9 +8,9 @@ import AVFoundation
 
 struct FileSaveView: View {
     let videoURL: URL
-    let outputFolder: URL?
+    let outputFolder: URL
     let name: String
-    let cropRect: CGRect
+    let cropRect: CGRect?
     let startT: CGFloat
     let endT: CGFloat
 
@@ -18,8 +18,17 @@ struct FileSaveView: View {
         HStack {
             Button(action: {
                 Task {
-//                    let result = await GifExporter().export(videoAt: videoURL, toFolder: outputFolder!, withName: name, croppingTo: cropRect, startingAt: startT, endingAt: endT)
-                    print(outputFolder)
+                    let result = await GifExporter().export(
+                            videoAt: videoURL,
+                            toFolder: outputFolder,
+                            withName: name,
+                            croppingTo: cropRect,
+                            startingAt: startT,
+                            endingAt: endT,
+                            withScale: 1.0,
+                            withFPS: 30
+                    )
+                    print(result)
                 }
             }) {
                 Text("gif")

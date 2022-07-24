@@ -13,6 +13,7 @@ struct ExportView: View {
     let videoURL: URL
     let player: AVPlayer
 
+    @State private var cropRect: CGRect?
     @State private var currentTime: CMTime = CMTime.zero
     @State private var startT = 0.0
     @State private var stopT = 1.0
@@ -24,7 +25,7 @@ struct ExportView: View {
 
     var body: some View {
         VStack {
-            PlayerCropperView(player: player).onAppear { player.play() }
+            PlayerCropperView(player: player, cropRect: $cropRect).onAppear { player.play() }
             Spacer(minLength: 24)
             TrimmerView(mediaURL: videoURL, currentTime: currentTime) { t, position in
                 if position == .left {
@@ -34,7 +35,7 @@ struct ExportView: View {
                 }
                 player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
             }.frame(height: 100)
-            FileView(videoURL: videoURL, cropRect: CGRect.zero, startT: 0, endT: 1).frame(height: 100).frame(maxWidth: 900)
+            FileView(videoURL: videoURL, cropRect: cropRect, startT: 0, endT: 1).frame(height: 100).frame(maxWidth: 900)
         }.onAppear {
             Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in
                 let duration = player.currentItem!.duration.seconds

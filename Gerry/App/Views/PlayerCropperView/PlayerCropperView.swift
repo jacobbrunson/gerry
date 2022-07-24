@@ -9,10 +9,14 @@ import AVKit
 
 struct PlayerCropperView: NSViewControllerRepresentable {
     let player: AVPlayer
+    let cropRect: Binding<CGRect?>
 
     func makeNSViewController(context: Context) -> PlayerCropperViewController {
         let viewController = PlayerCropperViewController()
         viewController.player = player
+        viewController.onSelect = {
+            print("cropped", $0.width, $0.height)
+        }
         return viewController
     }
 
@@ -23,6 +27,7 @@ struct PlayerCropperView: NSViewControllerRepresentable {
 
 class PlayerCropperViewController: NSViewController {
     var player = AVPlayer()
+    var onSelect: ((CGRect) -> ())?
 
     let playerView = AVPlayerView()
     let cropperView = CropperView()
@@ -30,6 +35,8 @@ class PlayerCropperViewController: NSViewController {
     override func loadView() {
         playerView.controlsStyle = .none
         playerView.player = player
+
+        cropperView.onSelect = onSelect
 
         view = NSView()
         view.subviews = [playerView, cropperView]
@@ -69,6 +76,8 @@ let handleLength = lineWidth * 9
 
 
 class CropperView: NSView {
+    var onSelect: ((CGRect) -> ())?
+
     private var _videoViewport = CGRect.zero
     var videoViewport: CGRect {
         get { _videoViewport }
@@ -187,7 +196,7 @@ class CropperView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
-//        onSelect!(getRect())
+        onSelect?(rect)
     }
 
     override func mouseDragged(with event: NSEvent) {
