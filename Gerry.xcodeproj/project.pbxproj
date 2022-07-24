@@ -17,12 +17,13 @@
 		6035451653AD6DA412F4FD79 /* ScreenCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */; };
 		603545B0446206096BF8D946 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 60354674B374F9B3511B6D2A /* stop.png */; };
 		603545EC084029EEB02CFF38 /* PlayerCropperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603547AF43953142B73E32CB /* PlayerCropperView.swift */; };
-		603546FA15C0D62BB86F1BE3 /* DefaultTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354BF2B1A1E051C99CFDF9 /* DefaultTextView.swift */; };
+		603546FA15C0D62BB86F1BE3 /* HighlightTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354BF2B1A1E051C99CFDF9 /* HighlightTextView.swift */; };
 		603547ABE5784AF572DE0037 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60354967583A11949F444708 /* Info.plist */; };
 		603547EA352B6C28113333AD /* TrimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354F65EC6803A8BF0762FD /* TrimmerView.swift */; };
 		603548369EE7787893171CCA /* FileSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603547563F61BCA752D74497 /* FileSaveView.swift */; };
 		6035484818ECC285CC46ABFC /* FileQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354F70F68DCAE175DA7043 /* FileQualityView.swift */; };
 		603549133523CD98D6CF6D9F /* openNewWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035417E35D2CF1C3940C8D3 /* openNewWindow.swift */; };
+		603549A03AB474AD7FB67512 /* FileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603545C759A67A196B28DB0F /* FileViewModel.swift */; };
 		603549D1FD0DD94B75D2D71E /* GerryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354C6487C42E19037BD157 /* GerryController.swift */; };
 		60354AAFE69650A9DC2A3937 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 603540C3D545D8773CA98C11 /* MainMenu.xib */; };
 		60354AC6AEC520AC7128CDCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6035467BD4AB1EDC497F19FD /* Assets.xcassets */; };
@@ -47,6 +48,7 @@
 		60354350E14CDE2F25F7ED86 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		6035440FE28892D775FC9807 /* EdgeCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EdgeCropHandle.swift; sourceTree = "<group>"; };
 		60354579162CD6E2B3BEC288 /* ExportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		603545C759A67A196B28DB0F /* FileViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileViewModel.swift; sourceTree = "<group>"; };
 		603546418019998302B6B71C /* Gerry.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Gerry.entitlements; sourceTree = "<group>"; };
 		60354674B374F9B3511B6D2A /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
 		6035467BD4AB1EDC497F19FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -59,7 +61,7 @@
 		6035493937EF35CB1E00D39F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		60354967583A11949F444708 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		60354AD3C1D7C01651A8D8D9 /* FileNameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileNameView.swift; sourceTree = "<group>"; };
-		60354BF2B1A1E051C99CFDF9 /* DefaultTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultTextView.swift; sourceTree = "<group>"; };
+		60354BF2B1A1E051C99CFDF9 /* HighlightTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HighlightTextView.swift; sourceTree = "<group>"; };
 		60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenCaptureController.swift; sourceTree = "<group>"; };
 		60354C6487C42E19037BD157 /* GerryController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GerryController.swift; sourceTree = "<group>"; };
 		60354D763B9B119409E73A01 /* FileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileView.swift; sourceTree = "<group>"; };
@@ -170,7 +172,8 @@
 				60354F70F68DCAE175DA7043 /* FileQualityView.swift */,
 				603547563F61BCA752D74497 /* FileSaveView.swift */,
 				60354D763B9B119409E73A01 /* FileView.swift */,
-				60354BF2B1A1E051C99CFDF9 /* DefaultTextView.swift */,
+				60354BF2B1A1E051C99CFDF9 /* HighlightTextView.swift */,
+				603545C759A67A196B28DB0F /* FileViewModel.swift */,
 			);
 			path = FileView;
 			sourceTree = "<group>";
@@ -287,13 +290,14 @@
 				6035484818ECC285CC46ABFC /* FileQualityView.swift in Sources */,
 				603548369EE7787893171CCA /* FileSaveView.swift in Sources */,
 				60354C3C86FE2A5E5145B457 /* FileView.swift in Sources */,
-				603546FA15C0D62BB86F1BE3 /* DefaultTextView.swift in Sources */,
+				603546FA15C0D62BB86F1BE3 /* HighlightTextView.swift in Sources */,
 				603547EA352B6C28113333AD /* TrimmerView.swift in Sources */,
 				60354BE5F8A03DD95452F9F1 /* PlayheadView.swift in Sources */,
 				60354EFBB11110D474E35134 /* TrimmerHandleView.swift in Sources */,
 				60354CCA34D10FD907904FD8 /* TimelineView.swift in Sources */,
 				603542C92AFE698947A5B04C /* Exporter.swift in Sources */,
 				60354E38985F81E1744B895B /* GifExporter.swift in Sources */,
+				603549A03AB474AD7FB67512 /* FileViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

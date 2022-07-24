@@ -6,28 +6,18 @@ import Foundation
 import SwiftUI
 
 struct FileNameView: View {
-    @Binding var outputFolder: URL?
-    @Binding var name: String
-
-    @State private var defaultOutputFolder = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
-    @State private var defaultName: String = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
+    @ObservedObject var viewModel: FileView.ViewModel
 
     var body: some View {
-        let outputFolderBinding = Binding<String>(get: {
-            outputFolder?.path ?? ""
-        }, set: {
-            outputFolder = URL(string: $0)!
-        })
-
         VStack {
             HStack {
                 Text("Output folder").frame(width: 90, alignment: .leading)
-                DefaultTextField(value: outputFolderBinding, defaultValue: defaultOutputFolder.path, clearDefaultOnFocus: false).frame(width: 260)
+                HighlightTextField(text: $viewModel.outputFolderPath)
                 Button(action: {
                     Task {
-                        outputFolder = await selectFolder()
+                        viewModel.outputFolder = await selectFolder()
                         // Todo: this should be set at a different point in flow
-                        UserDefaults.standard.set(outputFolder, forKey: "outputFolder")
+                        UserDefaults.standard.set(viewModel.outputFolder, forKey: "outputFolder")
                     }
                 }) {
                     Text("Browse...")
@@ -36,7 +26,7 @@ struct FileNameView: View {
             }
             HStack {
                 Text("File name").frame(width: 90, alignment: .leading)
-                DefaultTextField(value: $name, defaultValue: defaultName).frame(width: 120)
+                HighlightTextField(text: $viewModel.fileName)
                 Spacer()
             }
         }.padding().frame(width: 477)

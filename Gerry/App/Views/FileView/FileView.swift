@@ -12,14 +12,13 @@ struct FileView: View {
     let startT: CGFloat
     let endT: CGFloat
 
-    @State private var outputFolder = UserDefaults.standard.url(forKey: "outputFolder")
-    @State private var name = ""
+    @StateObject private var viewModel = ViewModel()
 
     var body: some View {
         HStack {
-            FileNameView(outputFolder: $outputFolder, name: $name)
+            FileNameView(viewModel: viewModel)
             FileQualityView()
-            FileSaveView(videoURL: videoURL, outputFolder: outputFolder!, name: name, cropRect: cropRect, startT: startT, endT: endT)
+            FileSaveView(videoURL: videoURL, outputFolder: viewModel.outputFolder, name: viewModel.fileName, cropRect: cropRect, startT: startT, endT: endT)
         }
     }
 }
