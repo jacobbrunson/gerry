@@ -59,11 +59,15 @@ class PlayerCropperViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+        onSelect?(videoViewport)
+    }
+
+    override func viewWillLayout() {
+        super.viewWillLayout()
         playerView.frame = videoViewport
         cropperView.frame = view.bounds
         cropperView.videoViewport = videoViewport
         cropperView.addTrackingArea(NSTrackingArea(rect: view.bounds, options: [.activeAlways, .mouseMoved], owner: cropperView, userInfo: nil))
-        onSelect?(playerView.frame)
     }
 
     var videoViewport: CGRect {
