@@ -14,20 +14,24 @@ struct FileSaveView: View {
     let startT: CGFloat
     let endT: CGFloat
 
+    private func export(using exporter: Exporter) async {
+        await exporter.export(
+                videoAt: videoURL,
+                toFolder: viewModel.outputFolder!,
+                withName: viewModel.fileName,
+                croppingTo: cropRect,
+                startingAt: startT,
+                endingAt: endT,
+                withScale: 1.0/viewModel.scaleDivisor,
+                withFrameRate: CGFloat(viewModel.frameRate)
+        )
+    }
+
     var body: some View {
         HStack {
             Button(action: {
                 Task {
-                    let result = await GifExporter().export(
-                            videoAt: videoURL,
-                            toFolder: viewModel.outputFolder!,
-                            withName: viewModel.fileName,
-                            croppingTo: cropRect,
-                            startingAt: startT,
-                            endingAt: endT,
-                            withScale: 1.0/viewModel.scaleDivisor,
-                            withFrameRate: CGFloat(viewModel.frameRate)
-                    )
+                    let result = await export(using: GifExporter())
                     print(result)
                 }
             }) {
@@ -51,7 +55,10 @@ struct FileSaveView: View {
                     .foregroundColor(Color("DarkText"))
 
             Button(action: {
-
+                Task {
+                    let result = await export(using: Mp4Exporter())
+                    print(result)
+                }
             }) {
                 Text("mp4")
                         .font(.title)

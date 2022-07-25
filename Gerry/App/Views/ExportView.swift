@@ -8,13 +8,12 @@ import AVFoundation
 import AppKit
 
 struct ExportView: View {
-    let tolerance = CMTime(value: 1, timescale: 1000)
-
     let videoURL: URL
     let player: AVPlayer
 
-    @State private var cropRect: CGRect?
     @State private var currentTime: CMTime = CMTime.zero
+
+    @State private var cropRect: CGRect?
     @State private var startT = 0.0
     @State private var endT = 1.0
 
