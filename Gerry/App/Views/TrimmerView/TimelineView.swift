@@ -9,7 +9,7 @@ import AVFoundation
 class TimelineView: NSView {
     var leftHandleView: TrimmerHandleView?
     var rightHandleView: TrimmerHandleView?
-    var thumbs: [Int:CGImage] = [:]
+    var thumbs: [CGImage] = []
     var currentTime = CMTime.zero
     var duration = CMTime.zero
 
@@ -33,11 +33,9 @@ class TimelineView: NSView {
         context.drawPath(using: .fill)
 
         // Thumbnails
-        for (i, thumb) in thumbs {
+        for (i, thumb) in thumbs.enumerated() {
             let rect = CGRect(x: thumb.width * i, y: 0, width: thumb.width, height: thumb.height)
-            //if rect.intersects(dirtyRect) {
             context.draw(thumb, in: rect)
-            //}
         }
 
         // Handles

@@ -50,6 +50,8 @@ class TrimmerViewController: NSViewController {
     var onUpdate: ((CGFloat, TrimmerHandlePosition) -> ())?
     var delegate: TrimmerViewCoordinator?
     var asset: AVAsset?
+    var thumbnailController: ThumbnailController?
+    var hasRequestedThumbnails = false
 
     func update(currentTime: CMTime) {
         playheadView.update(t: min(1, currentTime.seconds / asset!.duration.seconds))
@@ -83,66 +85,30 @@ class TrimmerViewController: NSViewController {
         timelineView.subviews = [leftHandleView, rightHandleView, playheadView]
 
         asset = AVAsset(url: mediaURL)
-
-        Task {
-            var i = 0
-            for await thumb in generateThumbs(asset: asset!) {
-                timelineView.thumbs[i] = thumb
-                timelineView.setNeedsDisplay(timelineView.frame)
-                i += 1
-            }
-        }
+        thumbnailController = ThumbnailController(asset: asset!, onThumbReady: nil, onComplete: {
+            print("thumbs complete", self.thumbnailController?.thumbs.count)
+            self.timelineView.thumbs = self.thumbnailController!.thumbs
+            self.timelineView.setNeedsDisplay(self.timelineView.frame)
+        })
 
         view = timelineView
     }
 
-    private func generateThumbs(asset: AVAsset) -> AsyncStream<CGImage> {
-        let videoSize = asset.tracks[0].naturalSize
-        let height = timelineView.frame.height
-        let width = videoSize.width / videoSize.height * height
-
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.maximumSize = CGSize(width: width, height: height)
-        generator.requestedTimeToleranceBefore = .zero
-        generator.requestedTimeToleranceAfter = .zero
-
-        let thumbCount = Int(ceil(timelineView.frame.width / width))
-        let times = getTimeValues(count: thumbCount, duration: asset.duration)
-
-        var i = 0
-        var prevImage: CGImage?
-        return AsyncStream { continuation in
-            generator.generateCGImagesAsynchronously(forTimes: times) { _, image, _, _, _ in
-                i += 1
-                if image != nil {
-                    continuation.yield(image!)
-                    prevImage = image
-                } else if prevImage != nil {
-                    continuation.yield(prevImage!)
-                }
-
-                if i == thumbCount {
-                    continuation.finish()
-                }
-            }
-        }
-    }
-
-    private func getTimeValues(count: Int, duration: CMTime) -> [NSValue] {
-        let frameDuration = duration.seconds / Double(count)
-        var timeValues: [NSValue] = []
-
-        for frameNumber in 0 ..< count {
-            let seconds = TimeInterval(frameDuration) * TimeInterval(frameNumber)
-            let time = CMTime(seconds: seconds, preferredTimescale: Int32(NSEC_PER_SEC))
-            timeValues.append(NSValue(time: time))
-        }
-
-        return timeValues
-    }
-
     override func viewWillAppear() {
         super.viewWillAppear()
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        timelineView.thumbs = timelineView.thumbs.isEmpty ? [] : [timelineView.thumbs.first!]
+        timelineView.setNeedsDisplay(timelineView.frame)
+
+        thumbnailController!.requestThumbnails(
+                frameSize: timelineView.frame.size,
+                shouldDebounce: hasRequestedThumbnails
+        )
+        hasRequestedThumbnails = true
     }
 }
 

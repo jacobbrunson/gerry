@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		16A7203828851467004D84E2 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A7203728851467004D84E2 /* AVKit.framework */; };
+		6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */; };
 		603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603546C2361A09FCC2501462 /* VertexCropHandle.swift */; };
 		603542C92AFE698947A5B04C /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354E933ADC961B34692731 /* Exporter.swift */; };
 		603543D6A2C60DD1C74EC34F /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035424823C715217ACA27F1 /* StatusBarController.swift */; };
@@ -57,6 +58,7 @@
 		6035472EC97E4C009E2E775B /* PlayheadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		603547563F61BCA752D74497 /* FileSaveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileSaveView.swift; sourceTree = "<group>"; };
 		603547AF43953142B73E32CB /* PlayerCropperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerCropperView.swift; sourceTree = "<group>"; };
+		6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailController.swift; sourceTree = "<group>"; };
 		6035487663E0A7C788D3A94B /* GifExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GifExporter.swift; sourceTree = "<group>"; };
 		6035490FCB14A8832D837B07 /* TrimmerHandleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrimmerHandleView.swift; sourceTree = "<group>"; };
 		6035493937EF35CB1E00D39F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				6035472EC97E4C009E2E775B /* PlayheadView.swift */,
 				6035490FCB14A8832D837B07 /* TrimmerHandleView.swift */,
 				60354350E14CDE2F25F7ED86 /* TimelineView.swift */,
+				6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */,
 			);
 			path = TrimmerView;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 				60354E38985F81E1744B895B /* GifExporter.swift in Sources */,
 				603549A03AB474AD7FB67512 /* FileViewModel.swift in Sources */,
 				60354AAEA5283D2E3BF6958D /* Mp4Exporter.swift in Sources */,
+				6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
