@@ -30,6 +30,7 @@ struct FileSaveView: View {
     var body: some View {
         HStack {
             Button(action: {
+                viewModel.regenerateDefaultFileName()
                 Task {
                     let result = await export(using: GifExporter())
                     print(result)
@@ -55,6 +56,7 @@ struct FileSaveView: View {
                     .foregroundColor(Color("DarkText"))
 
             Button(action: {
+                viewModel.regenerateDefaultFileName()
                 Task {
                     let result = await export(using: Mp4Exporter())
                     print(result)

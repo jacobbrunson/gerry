@@ -10,10 +10,19 @@ extension FileView {
     class ViewModel: ObservableObject {
         // File name
         @Published private var selectedFileName: String?
-        @Published private var defaultFileName = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
+        @Published private var defaultFileName = ""
         var fileName: String {
-            get { selectedFileName ?? defaultFileName }
+            get {
+                if defaultFileName.isEmpty {
+                    regenerateDefaultFileName()
+                }
+                return selectedFileName ?? defaultFileName
+            }
             set { selectedFileName = newValue.isEmpty ? nil : newValue }
+        }
+
+        func regenerateDefaultFileName() {
+            defaultFileName = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
         }
 
         // Frame rate
