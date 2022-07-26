@@ -108,6 +108,7 @@ class CropperView: NSView {
         }
     }
 
+    var isDragging = false
     var start = CGPoint.zero
     var end = CGPoint.zero
     var handle: CropHandle?
@@ -208,18 +209,29 @@ class CropperView: NSView {
         }
 
         if handle == nil {
-            start = constrainToVideoViewport(mouseLocation)
-            end = constrainToVideoViewport(mouseLocation)
+            let constrainedLocation = constrainToVideoViewport(mouseLocation)
+
+            // Clicked really far outside video viewport? Don't even register.
+            if pow(constrainedLocation.x - mouseLocation.x, 2) + pow(constrainedLocation.y - mouseLocation.y, 2) > 500 {
+                return
+            }
+
+            isDragging = true
+            start = constrainedLocation
+            end = constrainedLocation
         }
 
         setNeedsDisplay(bounds)
     }
 
     override func mouseUp(with event: NSEvent) {
+        isDragging = false
         onSelect?(rect)
     }
 
     override func mouseDragged(with event: NSEvent) {
+        guard isDragging else { return }
+
         if handle == nil {
             end.x += event.deltaX
             end.y -= event.deltaY
