@@ -26,7 +26,7 @@ struct ExportView: View {
         VStack {
             PlayerCropperView(player: player, cropRect: $cropRect).onAppear { player.play() }
             Spacer(minLength: 24)
-            TrimmerView(mediaURL: videoURL, currentTime: currentTime) { t, position in
+            TrimmerView(mediaURL: videoURL, currentTime: currentTime, cropRect: $cropRect) { t, position in
                 if position == .left {
                     startT = t
                 } else {

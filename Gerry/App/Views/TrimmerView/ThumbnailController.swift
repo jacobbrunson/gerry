@@ -25,7 +25,7 @@ class ThumbnailController {
         generator = AVAssetImageGenerator(asset: asset)
     }
 
-    func requestThumbnails(frameSize: CGSize, shouldDebounce: Bool) {
+    func requestThumbnails(frameSize: CGSize, cropRect: CGRect?, shouldDebounce: Bool) {
         print("requesting thumb generation")
 
         generationTimer?.invalidate()
@@ -37,14 +37,14 @@ class ThumbnailController {
             // It seems like the timer doesn't execute while a window UI interaction is occurring?
             // TODO: figure out how the hell swift and appkit works
             generationTimer = Timer.scheduledTimer(withTimeInterval: 0, repeats: false) { _ in
-                self.generate(frameSize: frameSize)
+                self.generate(frameSize: frameSize, cropRect: cropRect)
             }
         } else {
-            generate(frameSize: frameSize)
+            generate(frameSize: frameSize, cropRect: cropRect)
         }
     }
 
-    private func generate(frameSize: CGSize) {
+    private func generate(frameSize: CGSize, cropRect maybeCropRect: CGRect?) {
         print("beginning thumb generation")
 
         prevThumbs = currentThumbs
@@ -54,19 +54,22 @@ class ThumbnailController {
             currentThumbs = []
             isGenerating = true
         }
-
         let videoSize = asset.tracks[0].naturalSize
-        let thumbSize = CGSize(
-                width: videoSize.width / videoSize.height * frameSize.height,
-                height: frameSize.height
+        let cropRect = maybeCropRect ?? CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+        let scale = frameSize.height / cropRect.height
+        let scaledCropRect = CGRect(x: cropRect.minX * scale, y: (videoSize.height - cropRect.maxY) * scale, width: cropRect.width * scale, height: cropRect.height * scale)
+
+        let uncroppedSize = CGSize(
+                width: videoSize.width * scale,
+                height: videoSize.height * scale
         )
-        generator.maximumSize = thumbSize
+        generator.maximumSize = uncroppedSize
 
         let tolerance = CMTime(seconds: 0.1, preferredTimescale: 10000)
         generator.requestedTimeToleranceBefore = .zero
         generator.requestedTimeToleranceAfter = .zero
 
-        let thumbCount = Int(ceil(frameSize.width / thumbSize.width))
+        let thumbCount = Int(min(90, ceil(frameSize.width / scaledCropRect.width)))
         let times = getTimeValues(count: thumbCount, duration: asset.duration, needsFirstFrame: currentThumbs.isEmpty)
 
         var i = 0
@@ -78,8 +81,9 @@ class ThumbnailController {
             }
 
             if image != nil {
-                self.currentThumbs.append(image!)
-                prevImage = image
+                let croppedImage = image!.cropping(to: scaledCropRect)!
+                self.currentThumbs.append(croppedImage)
+                prevImage = croppedImage
             } else if prevImage != nil {
                 self.currentThumbs.append(prevImage!)
             }

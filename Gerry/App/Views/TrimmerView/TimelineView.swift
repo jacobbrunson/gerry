@@ -34,7 +34,8 @@ class TimelineView: NSView {
 
         // Thumbnails
         for (i, thumb) in thumbs.enumerated() {
-            let rect = CGRect(x: thumb.width * i, y: 0, width: thumb.width, height: thumb.height)
+            let width = frame.width / CGFloat(thumbs.count)
+            let rect = CGRect(x: Int(CGFloat(i) * width), y: 0, width: thumb.width, height: thumb.height)
             context.draw(thumb, in: rect)
         }
 

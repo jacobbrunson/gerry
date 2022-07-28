@@ -10,11 +10,13 @@ import AVFoundation
 struct TrimmerView: NSViewControllerRepresentable {
     let mediaURL: URL
     let currentTime: CMTime
+    var cropRect: Binding<CGRect?>
     let onUpdate: (CGFloat, TrimmerHandlePosition) -> ()
 
-    init(mediaURL: URL, currentTime: CMTime, onUpdate: @escaping (CGFloat, TrimmerHandlePosition) -> ()) {
+    init(mediaURL: URL, currentTime: CMTime, cropRect: Binding<CGRect?>, onUpdate: @escaping (CGFloat, TrimmerHandlePosition) -> ()) {
         self.mediaURL = mediaURL
         self.currentTime = currentTime
+        self.cropRect = cropRect
         self.onUpdate = onUpdate
     }
 
@@ -31,7 +33,7 @@ struct TrimmerView: NSViewControllerRepresentable {
     }
 
     func updateNSViewController(_ nsViewController: TrimmerViewController, context: Context) {
-        nsViewController.update(currentTime: currentTime)
+        nsViewController.update(currentTime: currentTime, cropRect: cropRect.wrappedValue)
     }
 }
 
@@ -52,9 +54,16 @@ class TrimmerViewController: NSViewController {
     var asset: AVAsset?
     var thumbnailController: ThumbnailController?
     var hasRequestedThumbnails = false
+    var cropRect: CGRect?
 
-    func update(currentTime: CMTime) {
+    func update(currentTime: CMTime, cropRect: CGRect?) {
         playheadView.update(t: min(1, currentTime.seconds / asset!.duration.seconds))
+        if self.cropRect != cropRect {
+            self.cropRect = cropRect
+            timelineView.thumbs = []
+            timelineView.setNeedsDisplay(timelineView.frame)
+            thumbnailController!.requestThumbnails(frameSize: timelineView.frame.size, cropRect: cropRect, shouldDebounce: true)
+        }
     }
 
     override func loadView() {
@@ -106,6 +115,7 @@ class TrimmerViewController: NSViewController {
 
         thumbnailController!.requestThumbnails(
                 frameSize: timelineView.frame.size,
+                cropRect: cropRect,
                 shouldDebounce: hasRequestedThumbnails
         )
         hasRequestedThumbnails = true
