@@ -18,7 +18,7 @@ extension FileView {
                 }
                 return selectedFileName ?? defaultFileName
             }
-            set { selectedFileName = newValue.isEmpty ? nil : newValue }
+            set { print("setting file name", newValue); selectedFileName = newValue.isEmpty ? nil : newValue }
         }
 
         func regenerateDefaultFileName() {

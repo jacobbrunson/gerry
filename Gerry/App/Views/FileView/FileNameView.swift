@@ -18,7 +18,12 @@ struct FileNameView: View {
                         let selectedURL =  await selectFolder()
                         viewModel.outputFolder = selectedURL
 
-                        if let bookmark = try? selectedURL.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil) {
+                        // Persist this URL and its associated security data in a "bookmark"
+                        if let bookmark = try? selectedURL.bookmarkData(
+                                options: .withSecurityScope,
+                                includingResourceValuesForKeys: nil,
+                                relativeTo: nil
+                        ) {
                             UserDefaults.standard.set(bookmark, forKey: "outputFolder")
                         }
                     }

@@ -16,10 +16,10 @@ class GerryController {
         DispatchQueue.main.async {
             Task {
                 let display = await self.screenCaptureController.getDisplay()
-                ExportView(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/5DFC00F3-45D7-4A98-BED0-84EBCC1753DA.mp4")!).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height-400))
+                ExportView(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/873E8F6E-CCE0-4BE3-B601-CD34279C8583.mp4")!).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height-400))
             }
         }
-        statusBarController.clickHandler = { [self]
+        statusBarController.clickHandler = {
             if self.state == .idle {
                 self.transition(to: .loading)
                 await self.screenCaptureController.beginRecording()
