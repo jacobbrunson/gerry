@@ -203,7 +203,8 @@ class CropperView: NSView {
         for candidateHandle in handles {
             if testGrab(pointA: mouseLocation, pointB: candidateHandle.point) {
                 handle = candidateHandle
-                addTrackingArea(NSTrackingArea(rect: candidateHandle.rect, owner: self))
+                //addTrackingArea(NSTrackingArea(rect: candidateHandle.rect, owner: self))
+                isDragging = true
                 break
             }
         }
