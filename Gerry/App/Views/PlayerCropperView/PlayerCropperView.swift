@@ -14,6 +14,7 @@ struct PlayerCropperView: NSViewControllerRepresentable {
     func makeNSViewController(context: Context) -> PlayerCropperViewController {
         let viewController = PlayerCropperViewController()
         viewController.player = player
+        viewController.cropRect = cropRect.wrappedValue
         viewController.onSelect = { rawRect in
             let videoViewport = viewController.videoViewport
 
@@ -37,12 +38,14 @@ struct PlayerCropperView: NSViewControllerRepresentable {
 
     func updateNSViewController(_ viewController: PlayerCropperViewController, context: Context) {
         viewController.player = player
+        viewController.cropRect = cropRect.wrappedValue
     }
 }
 
 class PlayerCropperViewController: NSViewController {
     var player = AVPlayer()
     var onSelect: ((CGRect) -> ())?
+    var cropRect: CGRect?
 
     let playerView = AVPlayerView()
     let cropperView = CropperView()
@@ -68,6 +71,12 @@ class PlayerCropperViewController: NSViewController {
         cropperView.frame = view.bounds
         cropperView.videoViewport = videoViewport
         cropperView.addTrackingArea(NSTrackingArea(rect: view.bounds, options: [.activeAlways, .mouseMoved], owner: cropperView, userInfo: nil))
+        if cropRect != nil {
+            let naturalSize = player.currentItem!.asset.tracks[0].naturalSize
+            let scale = videoViewport.width / naturalSize.width
+            cropperView.start = CGPoint(x: videoViewport.minX + cropRect!.minX * scale, y: videoViewport.minY + cropRect!.minY * scale)
+            cropperView.end = CGPoint(x: videoViewport.minX + cropRect!.maxX * scale, y: videoViewport.minY + cropRect!.maxY * scale)
+        }
     }
 
     var videoViewport: CGRect {
@@ -94,9 +103,11 @@ let lineWidth = 2.0
 let handleWidth = lineWidth * 2
 let handleLength = lineWidth * 9
 
-
 class CropperView: NSView {
     var onSelect: ((CGRect) -> ())?
+
+    var start = CGPoint.zero
+    var end = CGPoint.zero
 
     private var _videoViewport = CGRect.zero
     var videoViewport: CGRect {
@@ -109,8 +120,6 @@ class CropperView: NSView {
     }
 
     var isDragging = false
-    var start = CGPoint.zero
-    var end = CGPoint.zero
     var handle: CropHandle?
 
     var handles: [CropHandle] = [
@@ -152,7 +161,6 @@ class CropperView: NSView {
         context.clear(bounds)
         let trueRect = rect
         let displayRect = CGRect(x: trueRect.minX + lineWidth / 2, y: trueRect.minY + lineWidth / 2, width: trueRect.width - lineWidth, height: trueRect.height - lineWidth)
-
         context.addRects([
             CGRect(
                     x: videoViewport.minX,

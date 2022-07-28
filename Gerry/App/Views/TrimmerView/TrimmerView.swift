@@ -23,6 +23,7 @@ struct TrimmerView: NSViewControllerRepresentable {
     func makeNSViewController(context: Context) -> TrimmerViewController {
         let viewController = TrimmerViewController()
         viewController.mediaURL = mediaURL
+        viewController.cropRect = cropRect.wrappedValue
         viewController.onUpdate = onUpdate
         viewController.delegate = context.coordinator
         return viewController

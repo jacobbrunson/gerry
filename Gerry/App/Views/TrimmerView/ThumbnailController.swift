@@ -26,8 +26,6 @@ class ThumbnailController {
     }
 
     func requestThumbnails(frameSize: CGSize, cropRect: CGRect?, shouldDebounce: Bool) {
-        print("requesting thumb generation")
-
         generationTimer?.invalidate()
         generator.cancelAllCGImageGeneration()
 
