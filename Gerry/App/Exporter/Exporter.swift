@@ -5,6 +5,8 @@
 import Foundation
 
 protocol Exporter {
+    func getUrl(forOutputFolder: URL, withFileName: String) -> URL
+
     func export(
             videoAt: URL,
             toFolder: URL,

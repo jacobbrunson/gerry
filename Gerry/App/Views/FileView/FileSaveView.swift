@@ -16,10 +16,47 @@ struct FileSaveView: View {
     @Binding var saveProgress: Double?
 
     private func export(using exporter: Exporter) async {
-        await exporter.export(
+        let outputFolder = viewModel.outputFolder!
+        let fileName = viewModel.fileName
+        let outputURL = exporter.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
+
+        let fileExists = FileManager.default.fileExists(atPath: outputURL.path)
+
+
+        if fileExists {
+            let fileExistsAction = UserDefaults.standard.value(forKey: "fileExistsAction") as? String
+
+            if fileExistsAction == "cancel" {
+                saveProgress = nil
+                return
+            }
+
+            if fileExistsAction != "overwrite" {
+                let alert = NSAlert()
+                alert.messageText = "Overwrite file?"
+                alert.informativeText = "A file named \"\(outputURL.lastPathComponent)\" already exists. Would you like to replace it?"
+                alert.addButton(withTitle: "Cancel")
+                alert.addButton(withTitle: "Overwrite")
+                alert.alertStyle = .critical
+                alert.showsSuppressionButton = true
+
+                let shouldCancel = alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+
+                if alert.suppressionButton?.state.rawValue == 1 {
+                    UserDefaults.standard.set(shouldCancel ? "cancel" : "overwrite", forKey: "fileExistsAction")
+                }
+
+                if shouldCancel  {
+                    saveProgress = nil
+                    return
+                }
+            }
+        }
+
+        let result = await exporter.export(
                 videoAt: videoURL,
-                toFolder: viewModel.outputFolder!,
-                withName: viewModel.fileName,
+                toFolder: outputFolder,
+                withName: fileName,
                 croppingTo: cropRect,
                 startingAt: startT,
                 endingAt: endT,
@@ -27,6 +64,8 @@ struct FileSaveView: View {
                 withFrameRate: CGFloat(viewModel.frameRate),
                 onProgress: { if saveProgress != nil { saveProgress = $0 } }
         )
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
+        print(result)
     }
 
     var body: some View {
@@ -35,9 +74,7 @@ struct FileSaveView: View {
                 saveProgress = 0
                 viewModel.regenerateDefaultFileName()
                 Task {
-                    let result = await export(using: GifExporter())
-                    Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
-                    print(result)
+                    await export(using: GifExporter())
                 }
             }) {
                 if viewModel.frameRate > 30 {
@@ -64,9 +101,7 @@ struct FileSaveView: View {
                 saveProgress = 0
                 viewModel.regenerateDefaultFileName()
                 Task {
-                    let result = await export(using: Mp4Exporter())
-                    Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
-                    print(result)
+                    await export(using: Mp4Exporter())
                 }
             }) {
                 Text("mp4")

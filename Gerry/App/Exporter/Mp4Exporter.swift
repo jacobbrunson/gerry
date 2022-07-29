@@ -6,6 +6,10 @@ import Foundation
 import AVFoundation
 
 class Mp4Exporter: Exporter {
+    func getUrl(forOutputFolder outputFolder: URL, withFileName fileName: String) -> URL {
+        outputFolder.appendingPathComponent(fileName).appendingPathExtension("mp4")
+    }
+
     func export(
             videoAt url: URL,
             toFolder outputFolder: URL,
@@ -44,7 +48,7 @@ class Mp4Exporter: Exporter {
         instruction.layerInstructions = [transformer]
         videoComposition.instructions = [instruction]
 
-        let outputURL = outputFolder.appendingPathComponent(fileName).appendingPathExtension("mp4")
+        let outputURL = getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)!
         exportSession.videoComposition = videoComposition

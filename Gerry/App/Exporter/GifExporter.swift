@@ -6,6 +6,10 @@ import Foundation
 import AVFoundation
 
 class GifExporter: Exporter {
+    func getUrl(forOutputFolder outputFolder: URL, withFileName fileName: String) -> URL {
+        outputFolder.appendingPathComponent(fileName).appendingPathExtension("gif")
+    }
+
     func export(
             videoAt url: URL,
             toFolder outputFolder: URL,
@@ -110,8 +114,7 @@ class GifExporter: Exporter {
                     timer.invalidate()
                     onProgress(1)
 
-                    let outputURL = outputFolder.appendingPathComponent(fileName).appendingPathExtension("gif")
-
+                    let outputURL = self.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
                     let usingSecurityScope = outputFolder.startAccessingSecurityScopedResource()
 
