@@ -32,7 +32,8 @@ struct ExportView: View {
                 } else {
                     endT = t
                 }
-                player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+                player.seek(to: CMTime(seconds: player.currentItem!.duration.seconds * t * 0.999999, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+                player.play()
             }.frame(height: 100)
             GeometryReader { geometry in
                 let availableWidth = geometry.frame(in: .local).width
@@ -74,8 +75,8 @@ struct ExportView: View {
                 self.currentTime = currentTime
                 if currentTime.seconds >= endTime {
                     player.seek(to: CMTime(seconds: startTime, preferredTimescale: 1000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
-                    player.play()
                 }
+                player.play()
             }
         }.background(VisualEffectBackground(material: NSVisualEffectView.Material.underWindowBackground, blendingMode: .behindWindow, isEmphasized: true))
     }
