@@ -21,6 +21,8 @@ class GerryController {
         }
         statusBarController.clickHandler = {
             if self.state == .idle {
+                await self.openWindowsDialog()
+
                 self.transition(to: .loading)
                 await self.screenCaptureController.beginRecording()
                 self.transition(to: .recording)
@@ -33,6 +35,55 @@ class GerryController {
                         let display = await self.screenCaptureController.getDisplay()
                         ExportView(videoURL: videoURL).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
                     }
+                }
+            }
+        }
+    }
+
+    private func openWindowsDialog() async -> () {
+        let openWindows = await NSApp.windows.count - 2
+        if openWindows > 0 {
+            let openWindowsAction = UserDefaults.standard.value(forKey: "openWindowsAction") as? String
+
+            if openWindowsAction == "close" {
+                closeAllSaveWindows()
+            } else if openWindowsAction == nil {
+                return await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Close Gerry window\(openWindows > 1 ? "s" : "")?"
+                        alert.informativeText = "You have \(openWindows > 1 ? String(openWindows) : "a") Gerry save window\(openWindows > 1 ? "s" : "") open, which can reduce performance. For the smoothest video, close all Gerry windows."
+                        alert.addButton(withTitle: "Don't close")
+                        alert.addButton(withTitle: "Close \(openWindows) Gerry window\(openWindows > 1 ? "s" : "")")
+                        alert.alertStyle = .warning
+                        alert.showsSuppressionButton = true
+
+                        let shouldClose = alert.runModal() == NSApplication.ModalResponse.alertSecondButtonReturn
+
+                        if alert.suppressionButton?.state.rawValue == 1 {
+                            UserDefaults.standard.set(shouldClose ? "close" : "no-close", forKey: "openWindowsAction")
+                        }
+
+                        if shouldClose {
+                            self.closeAllSaveWindows()
+                        }
+
+                        continuation.resume()
+                    }
+                }
+            }
+
+            return await withCheckedContinuation { continuation in continuation.resume() }
+        }
+
+
+    }
+
+    private func closeAllSaveWindows() {
+        DispatchQueue.main.async {
+            NSApp!.windows.forEach {
+                if $0.title.contains("Save") {
+                    $0.close()
                 }
             }
         }

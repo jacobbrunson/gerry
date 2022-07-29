@@ -31,7 +31,7 @@ struct FileSaveView: View {
                 return
             }
 
-            if fileExistsAction != "overwrite" {
+            if fileExistsAction == nil {
                 let alert = NSAlert()
                 alert.messageText = "Overwrite file?"
                 alert.informativeText = "A file named \"\(outputURL.lastPathComponent)\" already exists. Would you like to replace it?"
