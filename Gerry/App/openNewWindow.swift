@@ -17,5 +17,6 @@ extension View {
         window.title = title
         window.contentView = NSHostingView(rootView: self)
         window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }
