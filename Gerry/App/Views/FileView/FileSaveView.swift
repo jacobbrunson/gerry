@@ -13,6 +13,7 @@ struct FileSaveView: View {
     let cropRect: CGRect?
     let startT: CGFloat
     let endT: CGFloat
+    @Binding var saveProgress: Double?
 
     private func export(using exporter: Exporter) async {
         await exporter.export(
@@ -23,16 +24,19 @@ struct FileSaveView: View {
                 startingAt: startT,
                 endingAt: endT,
                 withScale: 1.0/viewModel.scaleDivisor,
-                withFrameRate: CGFloat(viewModel.frameRate)
+                withFrameRate: CGFloat(viewModel.frameRate),
+                onProgress: { if saveProgress != nil { saveProgress = $0 } }
         )
     }
 
     var body: some View {
         HStack {
             Button(action: {
+                saveProgress = 0
                 viewModel.regenerateDefaultFileName()
                 Task {
                     let result = await export(using: GifExporter())
+                    Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
                     print(result)
                 }
             }) {
@@ -51,14 +55,17 @@ struct FileSaveView: View {
                 }
 
             }
+                    .disabled(saveProgress != nil)
                     .buttonStyle(PlainButtonStyle())
                     .cornerRadius(10)
                     .foregroundColor(Color("DarkText"))
 
             Button(action: {
+                saveProgress = 0
                 viewModel.regenerateDefaultFileName()
                 Task {
                     let result = await export(using: Mp4Exporter())
+                    Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
                     print(result)
                 }
             }) {
@@ -68,7 +75,7 @@ struct FileSaveView: View {
                         .background(Color("Yellow"))
                         .foregroundColor(Color("DarkText"))
                         .cornerRadius(10)
-            }.buttonStyle(PlainButtonStyle())
+            }.disabled(saveProgress != nil).buttonStyle(PlainButtonStyle())
         }.padding()
     }
 }

@@ -6,7 +6,17 @@ import Foundation
 import AVFoundation
 
 class GifExporter: Exporter {
-    func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFrameRate desiredFrameRate: CGFloat) async -> URL {
+    func export(
+            videoAt url: URL,
+            toFolder outputFolder: URL,
+            withName fileName: String,
+            croppingTo maybeRect: CGRect?,
+            startingAt startT: CGFloat,
+            endingAt endT: CGFloat,
+            withScale scale: CGFloat,
+            withFrameRate desiredFrameRate: CGFloat,
+            onProgress: @escaping (CGFloat) -> ()
+    ) async -> URL {
         print("Exporting gif to", outputFolder.path, fileName)
 
         let asset = AVURLAsset(url: url)
@@ -64,6 +74,14 @@ class GifExporter: Exporter {
         var framesProcessed = 0
         let startTime = CFAbsoluteTimeGetCurrent()
 
+        var actualProgress = 0.0
+        var desiredProgress = 0.0
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+            desiredProgress = framesProcessed == frameCount ? desiredProgress + (1 - desiredProgress) * 0.01 : CGFloat(framesProcessed) / CGFloat(frameCount) * 0.5
+            actualProgress += (desiredProgress - actualProgress) * 0.01
+            onProgress(actualProgress)
+        }
+
         return try! await withCheckedThrowingContinuation { continuation in
             var prevFrame: CGImage?
             generator.generateCGImagesAsynchronously(forTimes: timeValues) { (requestedTime, resultingImage, actualTime, result, error) in
@@ -89,6 +107,9 @@ class GifExporter: Exporter {
 
                     let result = CGImageDestinationFinalize(imageDestination)
 
+                    timer.invalidate()
+                    onProgress(1)
+
                     let outputURL = outputFolder.appendingPathComponent(fileName).appendingPathExtension("gif")
 
 
@@ -102,6 +123,7 @@ class GifExporter: Exporter {
                     }
 
                     if result {
+                        print("in a weird part of the night")
                         continuation.resume(returning: outputURL)
                     } else {
                         print("Gif export failed")

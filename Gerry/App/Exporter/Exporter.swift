@@ -13,7 +13,8 @@ protocol Exporter {
             startingAt: CGFloat,
             endingAt: CGFloat,
             withScale: CGFloat,
-            withFrameRate: CGFloat
+            withFrameRate: CGFloat,
+            onProgress: @escaping (CGFloat) -> ()
     ) async -> URL
 }
 

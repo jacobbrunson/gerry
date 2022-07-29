@@ -17,6 +17,8 @@ struct ExportView: View {
     @State private var startT = 0.0
     @State private var endT = 1.0
 
+    @State private var saveProgress: Double?
+
     init(videoURL: URL) {
         self.videoURL = videoURL
         player = AVPlayer(url: videoURL)
@@ -38,33 +40,38 @@ struct ExportView: View {
             GeometryReader { geometry in
                 let availableWidth = geometry.frame(in: .local).width
                 let image = Image("Gerry").resizable().padding(.leading, availableWidth >= 1500 ? 12 : 0)
-                let fileView = FileView(videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT).frame(height: 100).frame(maxWidth: 900)
+                let fileView = FileView(videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT, saveProgress: $saveProgress).frame(height: 100).frame(maxWidth: 900)
 
-
-                if availableWidth >= 1500 {
-                    ZStack {
+                ZStack(alignment: .bottomLeading) {
+                    if availableWidth >= 1500 {
+                        ZStack {
+                            HStack {
+                                image.frame(width: 200, height: 75)
+                                Spacer()
+                            }
+                            fileView
+                        }.frame(height: 100)
+                    } else if availableWidth >= 1100 {
                         HStack {
+                            Spacer()
                             image.frame(width: 200, height: 75)
+                            fileView
                             Spacer()
                         }
-                        fileView
-                    }.frame(height: 100)
-                } else if availableWidth >= 1100 {
-                    HStack {
-                        Spacer()
-                        image.frame(width: 200, height: 75)
-                        fileView
-                        Spacer()
-                    }
-                } else if availableWidth >= 750 {
-                    let width = 200 * (availableWidth - 750) / 350
-                    HStack {
-                        image.frame(width: width, height: width * 0.375).padding(.leading)
+                    } else if availableWidth >= 750 {
+                        let width = 200 * (availableWidth - 750) / 350
+                        HStack {
+                            image.frame(width: width, height: width * 0.375).padding(.leading)
+                            fileView
+                        }
+                    } else {
                         fileView
                     }
-                } else {
-                    fileView
+                    if saveProgress != nil {
+                        Rectangle().fill(Color("Yellow")).frame(width: availableWidth * saveProgress!, height: 4).animation(.easeOut)
+                    }
                 }
+
             }.frame(height: 100)
         }.onAppear {
             Timer.scheduledTimer(withTimeInterval: 1.0/60, repeats: true) { [self] timer in

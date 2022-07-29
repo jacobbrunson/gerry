@@ -11,6 +11,7 @@ struct FileView: View {
     let cropRect: CGRect?
     let startT: CGFloat
     let endT: CGFloat
+    @Binding var saveProgress: Double?
 
     @StateObject private var viewModel = ViewModel()
 
@@ -18,7 +19,7 @@ struct FileView: View {
         HStack {
             FileNameView(viewModel: viewModel)
             FileQualityView(viewModel: viewModel, cropRect: cropRect)
-            FileSaveView(viewModel: viewModel, videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT)
+            FileSaveView(viewModel: viewModel, videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT, saveProgress: $saveProgress)
         }
     }
 }

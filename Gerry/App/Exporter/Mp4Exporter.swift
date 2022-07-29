@@ -6,7 +6,17 @@ import Foundation
 import AVFoundation
 
 class Mp4Exporter: Exporter {
-    func export(videoAt url: URL, toFolder outputFolder: URL, withName fileName: String, croppingTo maybeRect: CGRect?, startingAt startT: CGFloat, endingAt endT: CGFloat, withScale scale: CGFloat, withFrameRate desiredFrameRate: CGFloat) async -> URL {
+    func export(
+            videoAt url: URL,
+            toFolder outputFolder: URL,
+            withName fileName: String,
+            croppingTo maybeRect: CGRect?,
+            startingAt startT: CGFloat,
+            endingAt endT: CGFloat,
+            withScale scale: CGFloat,
+            withFrameRate desiredFrameRate: CGFloat,
+            onProgress: @escaping (CGFloat) -> ()
+    ) async -> URL {
         print("Exporting mp4 to", outputFolder.path, fileName)
 
         let asset = AVURLAsset(url: url)
@@ -45,10 +55,14 @@ class Mp4Exporter: Exporter {
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mp4
 
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            onProgress(CGFloat(exportSession.progress))
+        }
+
         return await withCheckedContinuation { continuation in
             exportSession.exportAsynchronously {
                 print("done exporting mp4!")
-                print(exportSession.error)
+                onProgress(1)
                 continuation.resume(returning: outputURL)
             }
         }
