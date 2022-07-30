@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16697C7D2895A1AC0081FE5C /* G.png in Resources */ = {isa = PBXBuildFile; fileRef = 16697C7C2895A1AC0081FE5C /* G.png */; };
 		16A7203828851467004D84E2 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A7203728851467004D84E2 /* AVKit.framework */; };
 		6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */; };
 		603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603546C2361A09FCC2501462 /* VertexCropHandle.swift */; };
 		603542C92AFE698947A5B04C /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354E933ADC961B34692731 /* Exporter.swift */; };
+		6035435E4BF009B108AA12D6 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 6035444B2193FBAA5B990CE8 /* stop.png */; };
 		603543D6A2C60DD1C74EC34F /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035424823C715217ACA27F1 /* StatusBarController.swift */; };
 		603543EED56FA31736F312A1 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354579162CD6E2B3BEC288 /* ExportView.swift */; };
 		6035443A6BBC41430D363E7C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035493937EF35CB1E00D39F /* AppDelegate.swift */; };
 		603544DBC9BC8B718390629A /* FileNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354AD3C1D7C01651A8D8D9 /* FileNameView.swift */; };
 		6035451653AD6DA412F4FD79 /* ScreenCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */; };
-		603545B0446206096BF8D946 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 60354674B374F9B3511B6D2A /* stop.png */; };
 		603545EC084029EEB02CFF38 /* PlayerCropperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603547AF43953142B73E32CB /* PlayerCropperView.swift */; };
 		603546FA15C0D62BB86F1BE3 /* HighlightTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354BF2B1A1E051C99CFDF9 /* HighlightTextView.swift */; };
 		603547ABE5784AF572DE0037 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60354967583A11949F444708 /* Info.plist */; };
@@ -36,22 +37,21 @@
 		60354CCA34D10FD907904FD8 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354350E14CDE2F25F7ED86 /* TimelineView.swift */; };
 		60354D9F1C9FEC19409F024F /* FileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354EA6FDD9CB3ABD18EBE8 /* FileViewModel.swift */; };
 		60354E38985F81E1744B895B /* GifExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035487663E0A7C788D3A94B /* GifExporter.swift */; };
-		60354E54633FE10B64C54325 /* G.png in Resources */ = {isa = PBXBuildFile; fileRef = 6035409BDE99E63091B61598 /* G.png */; };
 		60354EFBB11110D474E35134 /* TrimmerHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035490FCB14A8832D837B07 /* TrimmerHandleView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		16697C7C2895A1AC0081FE5C /* G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = G.png; sourceTree = "<group>"; };
 		16A7203728851467004D84E2 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
-		6035409BDE99E63091B61598 /* G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = G.png; sourceTree = "<group>"; };
 		603540C3D545D8773CA98C11 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		6035416FE85A902E9C3C5EE7 /* Gerry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gerry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6035417E35D2CF1C3940C8D3 /* openNewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = openNewWindow.swift; sourceTree = "<group>"; };
 		6035424823C715217ACA27F1 /* StatusBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		60354350E14CDE2F25F7ED86 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		6035440FE28892D775FC9807 /* EdgeCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EdgeCropHandle.swift; sourceTree = "<group>"; };
+		6035444B2193FBAA5B990CE8 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
 		60354579162CD6E2B3BEC288 /* ExportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		603546418019998302B6B71C /* Gerry.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Gerry.entitlements; sourceTree = "<group>"; };
-		60354674B374F9B3511B6D2A /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
 		6035467BD4AB1EDC497F19FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		603546C2361A09FCC2501462 /* VertexCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VertexCropHandle.swift; sourceTree = "<group>"; };
 		6035472EC97E4C009E2E775B /* PlayheadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
@@ -198,8 +198,8 @@
 		60354F528053B15298E93A91 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
-				6035409BDE99E63091B61598 /* G.png */,
-				60354674B374F9B3511B6D2A /* stop.png */,
+				16697C7C2895A1AC0081FE5C /* G.png */,
+				6035444B2193FBAA5B990CE8 /* stop.png */,
 			);
 			path = Icons;
 			sourceTree = "<group>";
@@ -244,7 +244,7 @@
 				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					60354B52FFFD8E47EBF2A05A = {
-						DevelopmentTeam = 3KLY9T2A84;
+						DevelopmentTeam = HXF8F8539G;
 					};
 				};
 			};
@@ -275,9 +275,9 @@
 				60354AC6AEC520AC7128CDCD /* Assets.xcassets in Resources */,
 				603547ABE5784AF572DE0037 /* Info.plist in Resources */,
 				60354AAFE69650A9DC2A3937 /* MainMenu.xib in Resources */,
-				60354E54633FE10B64C54325 /* G.png in Resources */,
-				603545B0446206096BF8D946 /* stop.png in Resources */,
+				16697C7D2895A1AC0081FE5C /* G.png in Resources */,
 				60354B1E58F4BA6417A015F8 /* .gitignore in Resources */,
+				6035435E4BF009B108AA12D6 /* stop.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -327,15 +327,18 @@
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3KLY9T2A84;
+				DEVELOPMENT_TEAM = HXF8F8539G;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = me.brunson.Gerry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -464,15 +467,18 @@
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3KLY9T2A84;
+				DEVELOPMENT_TEAM = HXF8F8539G;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MARKETING_VERSION = 1.0;
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = me.brunson.Gerry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
