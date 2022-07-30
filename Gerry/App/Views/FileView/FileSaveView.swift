@@ -53,6 +53,9 @@ struct FileSaveView: View {
             }
         }
 
+        saveProgress = 0
+        viewModel.regenerateDefaultFileName()
+
         let result = await exporter.export(
                 videoAt: videoURL,
                 toFolder: outputFolder,
@@ -71,8 +74,6 @@ struct FileSaveView: View {
     var body: some View {
         HStack {
             Button(action: {
-                saveProgress = 0
-                viewModel.regenerateDefaultFileName()
                 Task {
                     await export(using: GifExporter())
                 }
@@ -98,8 +99,6 @@ struct FileSaveView: View {
                     .foregroundColor(Color("DarkText"))
 
             Button(action: {
-                saveProgress = 0
-                viewModel.regenerateDefaultFileName()
                 Task {
                     await export(using: Mp4Exporter())
                 }
