@@ -59,13 +59,14 @@ class Mp4Exporter: Exporter {
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mp4
 
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             onProgress(CGFloat(exportSession.progress))
         }
 
         return await withCheckedContinuation { continuation in
             exportSession.exportAsynchronously {
                 print("done exporting mp4!")
+                timer.invalidate()
                 onProgress(1)
                 continuation.resume(returning: outputURL)
             }
