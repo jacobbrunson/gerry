@@ -19,7 +19,6 @@ class GerryController {
 
     init() {
         NSApp.setActivationPolicy(.accessory)
-        openSaveWindow(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/FF3FD846-2B63-408F-B989-4430EF3235C7.mp4")!)
         statusBarController.clickHandler = {
             if self.state == .idle {
                 await self.openWindowsDialog()
