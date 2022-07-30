@@ -14,9 +14,12 @@ class GerryController {
 
     var openWindows = 0
 
+    var unsavedVideos: Set<URL> = []
+    var windowVideos: [NSWindow: URL] = [:]
+
     init() {
         NSApp.setActivationPolicy(.accessory)
-        openEditorWindow(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/FF3FD846-2B63-408F-B989-4430EF3235C7.mp4")!)
+        openSaveWindow(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/FF3FD846-2B63-408F-B989-4430EF3235C7.mp4")!)
         statusBarController.clickHandler = {
             if self.state == .idle {
                 await self.openWindowsDialog()
@@ -26,24 +29,63 @@ class GerryController {
             } else if self.state == .recording {
                 let videoURL = await self.screenCaptureController.stopRecording()
                 self.transition(to: .idle)
-                self.openEditorWindow(videoURL: videoURL)
+                self.openSaveWindow(videoURL: videoURL)
             }
         }
     }
 
-    private func openEditorWindow(videoURL: URL) {
+    private func openSaveWindow(videoURL: URL) {
         DispatchQueue.main.async {
             Task {
                 let display = await self.screenCaptureController.getDisplay()
-                let window = ExportView(videoURL: videoURL).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
+                let window = ExportView(videoURL: videoURL, onExport: {
+                    self.unsavedVideos.remove(videoURL)
+                }).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
                 self.openWindows += 1
+                self.unsavedVideos.insert(videoURL)
+                window.shouldClose = {
+                    if self.unsavedVideos.contains(videoURL) {
+                        self.unsavedVideoDialog(window: window)
+                        return false
+                    }
+                    return true
+                }
                 window.onClose = {
                     self.openWindows -= 1
+                    self.unsavedVideos.remove(videoURL)
                     if self.openWindows == 0 {
                         NSApp.setActivationPolicy(.accessory)
                     }
                 }
                 NotificationCenter.default.addObserver(window, selector: #selector(GerryWindow.windowWillClose), name: NSWindow.willCloseNotification, object: window)
+            }
+        }
+    }
+
+    private func unsavedVideoDialog(window: NSWindow) {
+        let unsavedVideoAction = UserDefaults.standard.value(forKey: "unsavedVideoAction") as? String
+
+        if unsavedVideoAction == "close" {
+            window.close()
+        } else if unsavedVideoAction == nil {
+            DispatchQueue.main.async {
+                let alert = NSAlert()
+                alert.messageText = "Unsaved recording"
+                alert.informativeText = "You are about to close a recording without saving. The recording will be lost. Are you sure you wish to do this?"
+                alert.addButton(withTitle: "Cancel")
+                alert.addButton(withTitle: "Close without saving")
+                alert.alertStyle = .critical
+                alert.showsSuppressionButton = true
+
+                let shouldClose = alert.runModal() == NSApplication.ModalResponse.alertSecondButtonReturn
+
+                if alert.suppressionButton?.state.rawValue == 1 {
+                    UserDefaults.standard.set(shouldClose ? "close" : "no-close", forKey: "unsavedVideoAction")
+                }
+
+                if shouldClose {
+                    window.close()
+                }
             }
         }
     }
@@ -90,7 +132,7 @@ class GerryController {
         DispatchQueue.main.async {
             NSApp!.windows.forEach {
                 if $0.title.contains("Save") {
-                    $0.close()
+                    $0.performClose(self)
                 }
             }
         }

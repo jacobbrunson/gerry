@@ -14,6 +14,7 @@ struct FileSaveView: View {
     let startT: CGFloat
     let endT: CGFloat
     @Binding var saveProgress: Double?
+    let onExport: () -> ()
 
     private func export(using exporter: Exporter) async {
         let outputFolder = viewModel.outputFolder!
@@ -68,6 +69,7 @@ struct FileSaveView: View {
                 onProgress: { if saveProgress != nil { saveProgress = $0 } }
         )
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
+        onExport()
         print(result)
     }
 

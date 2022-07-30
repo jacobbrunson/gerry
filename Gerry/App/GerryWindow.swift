@@ -24,8 +24,13 @@ extension View {
 }
 
 
-class GerryWindow: NSWindow {
+class GerryWindow: NSWindow, NSWindowDelegate {
+    var shouldClose: (() -> Bool)?
     var onClose: (() -> ())?
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        shouldClose == nil ? true : shouldClose!()
+    }
 
     @objc func windowWillClose(_ notification: Notification) {
         onClose?()

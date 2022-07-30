@@ -24,7 +24,7 @@
 		603547EA352B6C28113333AD /* TrimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354F65EC6803A8BF0762FD /* TrimmerView.swift */; };
 		603548369EE7787893171CCA /* FileSaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603547563F61BCA752D74497 /* FileSaveView.swift */; };
 		6035484818ECC285CC46ABFC /* FileQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354F70F68DCAE175DA7043 /* FileQualityView.swift */; };
-		603549133523CD98D6CF6D9F /* openNewWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035417E35D2CF1C3940C8D3 /* openNewWindow.swift */; };
+		603549133523CD98D6CF6D9F /* GerryWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */; };
 		603549D1FD0DD94B75D2D71E /* GerryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354C6487C42E19037BD157 /* GerryController.swift */; };
 		60354AAEA5283D2E3BF6958D /* Mp4Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354EA7229D1CA65BB04502 /* Mp4Exporter.swift */; };
 		60354AAFE69650A9DC2A3937 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 603540C3D545D8773CA98C11 /* MainMenu.xib */; };
@@ -45,7 +45,7 @@
 		16A7203728851467004D84E2 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		603540C3D545D8773CA98C11 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		6035416FE85A902E9C3C5EE7 /* Gerry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gerry.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6035417E35D2CF1C3940C8D3 /* openNewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = openNewWindow.swift; sourceTree = "<group>"; };
+		6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GerryWindow.swift; sourceTree = "<group>"; };
 		6035424823C715217ACA27F1 /* StatusBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		60354350E14CDE2F25F7ED86 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		6035440FE28892D775FC9807 /* EdgeCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EdgeCropHandle.swift; sourceTree = "<group>"; };
@@ -102,7 +102,7 @@
 				6035424823C715217ACA27F1 /* StatusBarController.swift */,
 				60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */,
 				60354C6487C42E19037BD157 /* GerryController.swift */,
-				6035417E35D2CF1C3940C8D3 /* openNewWindow.swift */,
+				6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */,
 				60354F868B0CA7B90DCA1D5F /* Views */,
 				60354C417788EA1E9DD1D597 /* Exporter */,
 			);
@@ -292,7 +292,7 @@
 				603543D6A2C60DD1C74EC34F /* StatusBarController.swift in Sources */,
 				6035451653AD6DA412F4FD79 /* ScreenCaptureController.swift in Sources */,
 				603549D1FD0DD94B75D2D71E /* GerryController.swift in Sources */,
-				603549133523CD98D6CF6D9F /* openNewWindow.swift in Sources */,
+				603549133523CD98D6CF6D9F /* GerryWindow.swift in Sources */,
 				603543EED56FA31736F312A1 /* ExportView.swift in Sources */,
 				603545EC084029EEB02CFF38 /* PlayerCropperView.swift in Sources */,
 				60354C86147735E33BA748FB /* CropHandle.swift in Sources */,

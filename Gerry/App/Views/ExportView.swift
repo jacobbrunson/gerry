@@ -9,6 +9,7 @@ import AppKit
 
 struct ExportView: View {
     let videoURL: URL
+    let onExport: () -> ()
     let player: AVPlayer
 
     @State private var currentTime: CMTime = CMTime.zero
@@ -19,8 +20,9 @@ struct ExportView: View {
 
     @State private var saveProgress: Double?
 
-    init(videoURL: URL) {
+    init(videoURL: URL, onExport: @escaping () -> ()) {
         self.videoURL = videoURL
+        self.onExport = onExport
         player = AVPlayer(url: videoURL)
     }
 
@@ -40,7 +42,7 @@ struct ExportView: View {
             GeometryReader { geometry in
                 let availableWidth = geometry.frame(in: .local).width
                 let image = Image("Gerry").resizable().padding(.leading, availableWidth >= 1500 ? 12 : 0)
-                let fileView = FileView(videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT, saveProgress: $saveProgress).frame(height: 100).frame(maxWidth: 900)
+                let fileView = FileView(videoURL: videoURL, cropRect: cropRect, startT: startT, endT: endT, saveProgress: $saveProgress, onExport: onExport).frame(height: 100).frame(maxWidth: 900)
 
                 ZStack(alignment: .bottomLeading) {
                     if availableWidth >= 1500 {
