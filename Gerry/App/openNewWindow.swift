@@ -6,8 +6,8 @@ import Foundation
 import SwiftUI
 
 extension View {
-    func openNewWindow(title: String, contentRect: CGRect) {
-        let window = NSWindow(
+    func openNewWindow(title: String, contentRect: CGRect) -> GerryWindow {
+        let window = GerryWindow(
                 contentRect: contentRect,
                 styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
                 backing: .buffered,
@@ -17,6 +17,17 @@ extension View {
         window.title = title
         window.contentView = NSHostingView(rootView: self)
         window.makeKeyAndOrderFront(nil)
+        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
+        return window
+    }
+}
+
+
+class GerryWindow: NSWindow {
+    var onClose: (() -> ())?
+
+    @objc func windowWillClose(_ notification: Notification) {
+        onClose?()
     }
 }

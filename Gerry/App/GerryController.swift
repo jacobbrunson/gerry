@@ -12,36 +12,42 @@ class GerryController {
 
     var state = GerryState.idle
 
+    var openWindows = 0
+
     init() {
-        DispatchQueue.main.async {
-            Task {
-                let display = await self.screenCaptureController.getDisplay()
-                ExportView(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/FF3FD846-2B63-408F-B989-4430EF3235C7.mp4")!).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height-400))
-            }
-        }
+        openEditorWindow(videoURL: URL(string: "file:///var/folders/p3/rnrgknms7c72zcxt79p8dw440000gn/T/me.brunson.Gerry/FF3FD846-2B63-408F-B989-4430EF3235C7.mp4")!)
         statusBarController.clickHandler = {
             if self.state == .idle {
                 await self.openWindowsDialog()
-
                 self.transition(to: .loading)
                 await self.screenCaptureController.beginRecording()
                 self.transition(to: .recording)
             } else if self.state == .recording {
                 let videoURL = await self.screenCaptureController.stopRecording()
-                print(videoURL)
                 self.transition(to: .idle)
-                DispatchQueue.main.async {
-                    Task {
-                        let display = await self.screenCaptureController.getDisplay()
-                        ExportView(videoURL: videoURL).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
+                self.openEditorWindow(videoURL: videoURL)
+            }
+        }
+    }
+
+    private func openEditorWindow(videoURL: URL) {
+        DispatchQueue.main.async {
+            Task {
+                let display = await self.screenCaptureController.getDisplay()
+                let window = ExportView(videoURL: videoURL).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
+                self.openWindows += 1
+                window.onClose = {
+                    self.openWindows -= 1
+                    if self.openWindows == 0 {
+                        NSApp.setActivationPolicy(.accessory)
                     }
                 }
+                NotificationCenter.default.addObserver(window, selector: #selector(GerryWindow.windowWillClose), name: NSWindow.willCloseNotification, object: window)
             }
         }
     }
 
     private func openWindowsDialog() async -> () {
-        let openWindows = await NSApp.windows.count - 2
         if openWindows > 0 {
             let openWindowsAction = UserDefaults.standard.value(forKey: "openWindowsAction") as? String
 
@@ -51,10 +57,10 @@ class GerryController {
                 return await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
                     DispatchQueue.main.async {
                         let alert = NSAlert()
-                        alert.messageText = "Close Gerry window\(openWindows > 1 ? "s" : "")?"
-                        alert.informativeText = "You have \(openWindows > 1 ? String(openWindows) : "a") Gerry save window\(openWindows > 1 ? "s" : "") open, which can reduce performance. For the smoothest video, close all Gerry windows."
+                        alert.messageText = "Close Gerry window\(self.openWindows > 1 ? "s" : "")?"
+                        alert.informativeText = "You have \(self.openWindows > 1 ? String(self.openWindows) : "a") Gerry save window\(self.openWindows > 1 ? "s" : "") open, which can reduce performance. For the smoothest video, close all Gerry windows."
                         alert.addButton(withTitle: "Don't close")
-                        alert.addButton(withTitle: "Close \(openWindows) Gerry window\(openWindows > 1 ? "s" : "")")
+                        alert.addButton(withTitle: "Close \(self.openWindows) Gerry window\(self.openWindows > 1 ? "s" : "")")
                         alert.alertStyle = .warning
                         alert.showsSuppressionButton = true
 

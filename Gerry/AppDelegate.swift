@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var gerryController: GerryController?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        NSApp.setActivationPolicy(.accessory)
         gerryController = GerryController()
     }
 }
