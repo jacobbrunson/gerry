@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gerry - gif screen capture tool</title>
+    <noscript
+      ><meta http-equiv="refresh" content="0.05;URL='/about'"
+    /></noscript>
+    <script type="text/javascript" defer>
+      function easeOutExpo(x) {
+        return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+      }
+
+      function easeOutQuad(x) {
+        return 1 - (1 - x) * (1 - x);
+      }
+
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+      };
+
+      class Wave {
+        constructor({
+          canvas,
+          points,
+          color,
+          inverted,
+          wavelenth,
+          amplitude,
+          shift,
+        }) {
+          this.canvas = canvas;
+          this.points = points;
+          this.color = color;
+          this.inverted = inverted;
+          this.wavelenth = wavelenth;
+          this.amplitude = amplitude;
+          this.shift = shift;
+          this.visibility = 1;
+        }
+
+        render(t, ctx) {
+          const f = (i) =>
+            Math.sin(t / this.wavelenth + (i * Math.PI) / this.points.length) *
+            this.amplitude;
+          const X = (i) => (i * canvas.width) / (this.points.length - 1);
+          const Y = (i) =>
+            this.inverted
+              ? canvas.height -
+                (this.points[i] - f(i)) * easeOutQuad(this.visibility)
+              : (this.points[i] + f(i)) * easeOutQuad(this.visibility);
+
+          ctx.beginPath();
+
+          ctx.moveTo(0, Y(0));
+
+          for (let i = 1; i < this.points.length; i++) {
+            ctx.bezierCurveTo(
+              X(i - 0.5),
+              Y(i - 1),
+              X(i - 0.5),
+              Y(i),
+              X(i),
+              Y(i)
+            );
+          }
+
+          const straightY = this.inverted ? canvas.height : 0;
+          ctx.lineTo(canvas.width, straightY);
+          ctx.lineTo(0, straightY);
+          ctx.lineTo(0, Y(0));
+
+          ctx.globalAlpha = this.visibility;
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // for (let i = 1; i < this.points.length; i++) {
+          //   // Start and end points
+          //   ctx.fillStyle = "blue";
+          //   ctx.beginPath();
+          //   ctx.arc(X(i - 1), Y[i - 1], 5, 0, 2 * Math.PI); // Start point
+          //   ctx.arc(X(i), Y[i], 5, 0, 2 * Math.PI); // End point
+          //   ctx.fill();
+
+          //   // Control points
+          //   ctx.fillStyle = "red";
+          //   ctx.beginPath();
+          //   ctx.arc(X(i - 0.5), Y[i - 1], 5, 0, 2 * Math.PI); // Control point one
+          //   ctx.arc(X(i - 0.5), Y[i - 1], 5, 0, 2 * Math.PI); // Control point two
+          //   ctx.fill();
+          // }
+        }
+      }
+
+      const lineWidth = 8.0;
+      const HANDLE_WIDTH = 16.0;
+      const handleLength = 48.0;
+
+      const timeline = new Image(5358, 300);
+      timeline.src = "/img/Timeline.png";
+
+      class Cropper {
+        constructor({ canvas }) {
+          this.canvas = canvas;
+          this.start = [0, 0];
+          this.end = [canvas.width - 0, canvas.height - 0];
+          this.trimmer = 0;
+          this.button = 0;
+        }
+
+        renderCorner(corner, ctx) {
+          ctx.beginPath();
+
+          const handleWidth = HANDLE_WIDTH * (1 - this.trimmer);
+
+          if (corner === 0) {
+            ctx.rect(
+              this.start[0],
+              this.start[1] - handleWidth,
+              handleLength,
+              handleWidth
+            );
+            ctx.rect(
+              this.start[0] - handleWidth,
+              this.start[1] - handleWidth,
+              handleWidth,
+              handleLength + handleWidth
+            );
+          } else if (corner === 1) {
+            ctx.rect(
+              this.end[0] - handleLength,
+              this.start[1] - handleWidth,
+              handleLength,
+              handleWidth
+            );
+            ctx.rect(
+              this.end[0],
+              this.start[1] - handleWidth,
+              handleWidth,
+              handleLength + handleWidth
+            );
+          } else if (corner === 2) {
+            ctx.rect(
+              this.end[0] - handleLength,
+              this.end[1],
+              handleLength,
+              handleWidth
+            );
+            ctx.rect(
+              this.end[0],
+              this.end[1] - handleLength,
+              handleWidth,
+              handleLength + handleWidth
+            );
+          } else if (corner === 3) {
+            ctx.rect(this.start[0], this.end[1], handleLength, handleWidth);
+            ctx.rect(
+              this.start[0] - handleWidth,
+              this.end[1] - handleLength,
+              handleWidth,
+              handleLength + handleWidth
+            );
+          }
+
+          ctx.fillStyle = "rgb(255, 204, 0)";
+          ctx.fill();
+        }
+
+        renderEdge(edge, ctx) {
+          const handleWidth = HANDLE_WIDTH * (1 - this.trimmer);
+
+          ctx.beginPath();
+
+          if (edge === 0) {
+            ctx.rect(
+              (this.start[0] + this.end[0] - handleLength) / 2,
+              this.start[1],
+              handleLength,
+              handleWidth
+            );
+          } else if (edge === 1) {
+            ctx.rect(
+              this.end[0] - handleWidth,
+              (this.start[1] + this.end[1] - handleLength) / 2,
+              handleWidth,
+              handleLength
+            );
+          } else if (edge === 2) {
+            ctx.rect(
+              (this.start[0] + this.end[0] - handleLength) / 2,
+              this.end[1] - handleWidth,
+              handleLength,
+              handleWidth
+            );
+          } else if (edge === 3) {
+            ctx.rect(
+              this.start[0],
+              (this.start[1] + this.end[1] - handleLength) / 2,
+              handleWidth,
+              handleLength
+            );
+          }
+
+          ctx.fillStyle = "rgb(255, 204, 0)";
+          ctx.fill();
+        }
+
+        renderDarkness(ctx) {
+          // Top, bottom
+          ctx.beginPath();
+          ctx.rect(0, 0, canvas.width, this.start[1]);
+          ctx.rect(0, this.end[1], canvas.width, canvas.height - this.end[1]);
+          ctx.fillStyle = `rgba(0, 0, 0, ${0.7 - this.trimmer * 0.7})`;
+          ctx.fill();
+
+          // Left, right
+          ctx.beginPath();
+          ctx.rect(
+            this.end[0],
+            this.start[1],
+            canvas.width - this.end[0],
+            this.end[1] - this.start[1]
+          );
+          ctx.rect(
+            0,
+            this.start[1],
+            this.start[0],
+            this.end[1] - this.start[1]
+          );
+          ctx.fillStyle = `rgba(0, 0, 0, ${0.7 - this.button * 0.7})`;
+          ctx.fill();
+        }
+
+        renderOutline(ctx) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(255, 204, 0, ${1 - this.button})`;
+
+          // Right
+          ctx.moveTo(this.end[0], this.start[1] - lineWidth / 2);
+          ctx.lineTo(this.end[0], this.end[1] + lineWidth / 2);
+
+          // Left
+          ctx.moveTo(this.start[0], this.end[1] + lineWidth / 2);
+          ctx.lineTo(this.start[0], this.start[1] - lineWidth / 2);
+
+          ctx.lineWidth = lineWidth + this.trimmer * 24;
+          ctx.stroke();
+
+          // Top
+          ctx.moveTo(this.start[0], this.start[1]);
+          ctx.lineTo(this.end[0], this.start[1]);
+
+          // Bottom
+          ctx.moveTo(this.end[0], this.end[1]);
+          ctx.lineTo(this.start[0], this.end[1]);
+
+          ctx.lineWidth = lineWidth;
+          ctx.stroke();
+        }
+
+        renderTimeline(t, ctx) {
+          ctx.globalAlpha = Math.max((this.trimmer - 0.5 - this.button) * 2, 0);
+          console.log(2 * ((timeline.height * 16) / 9));
+          ctx.drawImage(
+            timeline,
+            canvas.width < 2200 ? -5 * ((timeline.height * 16) / 9) : 0,
+            this.start[1],
+            timeline.width,
+            timeline.height
+          );
+          ctx.globalAlpha = 1;
+
+          if (this.trimmer === 1 && this.button === 0) {
+            ctx.beginPath();
+            const px = this.start[0] + t * (this.end[0] - this.start[0]);
+            ctx.moveTo(px, this.start[1]);
+            ctx.lineTo(px, this.end[1]);
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = "rgb(255, 204, 0)";
+            ctx.stroke();
+          }
+        }
+
+        renderButton(t, ctx) {
+          const availableWidth = this.end[0] - this.start[0];
+          const gutter = 40;
+          const buttonWidth = (availableWidth - gutter) / 2;
+          const buttonHeight = this.end[1] - this.start[1];
+
+          ctx.beginPath();
+          ctx.roundRect(
+            this.start[0],
+            this.start[1],
+            buttonWidth,
+            buttonHeight,
+            12
+          );
+          ctx.fillStyle = `rgb(255, 204, 0, ${this.button})`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.roundRect(
+            this.start[0] + buttonWidth + gutter,
+            this.start[1],
+            buttonWidth,
+            buttonHeight,
+            12
+          );
+          ctx.fillStyle = `rgb(255, 204, 0, ${this.button})`;
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(0, 0, 0, ${this.button})`;
+          ctx.font = "72px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(
+            "gif",
+            this.start[0] + buttonWidth / 2,
+            (this.start[1] + this.end[1]) / 2 + 20
+          );
+          ctx.fillText(
+            "mp4",
+            this.start[0] + (buttonWidth * 3) / 2 + gutter,
+            (this.start[1] + this.end[1]) / 2 + 20
+          );
+        }
+
+        render(t, ctx) {
+          this.renderTimeline(t, ctx);
+          this.renderDarkness(ctx);
+          this.renderOutline(ctx);
+          for (let i = 0; i < 4; i++) {
+            this.renderCorner(i, ctx);
+            this.renderEdge(i, ctx);
+          }
+          this.renderButton(t, ctx);
+        }
+      }
+
+      class WobblyFrame {
+        constructor({ canvas, wavelenth, amplitude, offset }) {
+          this.canvas = canvas;
+          this.wavelenth = wavelenth;
+          this.amplitude = amplitude;
+          this.offset = offset;
+        }
+
+        render(t, ctx) {
+          const w = this.offset;
+          ctx.beginPath();
+
+          ctx.moveTo(w, w);
+
+          [
+            [0, 20, 10, -10, 15, 0],
+            [0, 5, -5, -15, 0],
+            [0, -15, 5, -15, 15, 0],
+            [0, -3, -10, 0],
+          ].forEach((points, j) => {
+            for (let i = 0; i < points.length; i++) {
+              let axisLength = j % 2 === 1 ? canvas.height : canvas.width;
+              const f = (i) =>
+                Math.sin(t / this.wavelenth + (i * Math.PI) / points.length) *
+                this.amplitude;
+
+              let P = (i) =>
+                w + ((axisLength - w * 2) * i) / (points.length - 1);
+              let T = (i) => w + points[i] + f(i);
+
+              if (j === 0) {
+                ctx.bezierCurveTo(
+                  P(i - 0.5),
+                  T(i - 1),
+                  P(i - 0.5),
+                  T(i),
+                  P(i),
+                  T(i)
+                );
+              } else if (j === 1) {
+                ctx.bezierCurveTo(
+                  canvas.width - T(i - 1),
+                  P(i - 0.5),
+                  canvas.width - T(i),
+                  P(i - 0.5),
+                  canvas.width - T(i),
+                  P(i)
+                );
+              } else if (j === 2) {
+                ctx.bezierCurveTo(
+                  canvas.width - P(i - 0.5),
+                  canvas.height - T(i - 1),
+                  canvas.width - P(i - 0.5),
+                  canvas.height - T(i),
+                  canvas.width - P(i),
+                  canvas.height - T(i)
+                );
+              } else if (j == 3) {
+                ctx.bezierCurveTo(
+                  T(i - 1),
+                  canvas.height - P(i - 0.5),
+                  T(i),
+                  canvas.height - P(i - 0.5),
+                  T(i),
+                  canvas.height - P(i)
+                );
+              }
+            }
+          });
+          ctx.closePath();
+
+          ctx.rect(-20, -20, canvas.width + 40, canvas.height + 40);
+
+          ctx.fillStyle = "rgb(255, 204, 0)";
+          ctx.strokeStyle = "rgb(255, 204, 0)";
+          ctx.fill("evenodd");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.querySelector("#canvas");
+
+        canvas.width = window.innerWidth * 2;
+        canvas.height = window.innerHeight * 2;
+        window.addEventListener("resize", () => {
+          canvas.width = window.innerWidth * 2;
+          canvas.height = window.innerHeight * 2;
+        });
+
+        const ctx = canvas.getContext("2d");
+
+        const waves = [
+          new Wave({
+            canvas,
+            points: [170, 340, 250],
+            color: "#1c1c19",
+            wavelenth: 4910,
+            amplitude: 100,
+          }),
+          new Wave({
+            canvas,
+            points: [450, 180, 330, 430],
+            color: "#1c1c19",
+            inverted: true,
+            wavelenth: 6370,
+            amplitude: 100,
+          }),
+
+          new Wave({
+            canvas,
+            points: [150, 100, 260, 180, 50, 80],
+            color: "#2f2d23",
+            wavelenth: 3123,
+            amplitude: 75,
+          }),
+          new Wave({
+            canvas,
+            points: [80, 250, 50, 175, 120, 210],
+            color: "#2f2d23",
+            wavelenth: 3775,
+            amplitude: 75,
+            inverted: true,
+          }),
+
+          new Wave({
+            canvas,
+            points: [25, 40, 90, 65, 37, 100, 50, 20, 80],
+            color: "#685b18",
+            wavelenth: 1885,
+            amplitude: 40,
+          }),
+          new Wave({
+            canvas,
+            points: [100, 60, 80, 30, 50, 90, 70, 25, 75],
+            color: "#685b18",
+            wavelenth: 1462,
+            amplitude: 40,
+            inverted: true,
+          }),
+
+          new Wave({
+            canvas,
+            points: [10, 60, 28, 42, 55, 5, 10, 37, 5, 13, 28, 50],
+            color: "#c2a306",
+            wavelenth: 1337,
+            amplitude: 20,
+          }),
+          new Wave({
+            canvas,
+            points: [50, 30, 10, 5, 20, 40, 30, 60, 30],
+            color: "#c2a306",
+            wavelenth: 1122,
+            amplitude: 20,
+            inverted: true,
+          }),
+        ];
+
+        const cropper = new Cropper({ canvas });
+
+        const frame = new WobblyFrame({
+          canvas,
+          wavelenth: 500,
+          amplitude: 5,
+          offset: 20,
+        });
+
+        const stages = [
+          {
+            setup: () => {
+              const title = document.createElement("span");
+              title.className = "title";
+              title.innerText = "Meet Gerry.";
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `<span class="em">Gerry makes gifs.</span>`;
+              return [title, text];
+            },
+            render: (T, t, ctx) => {
+              waves.forEach((wave, i) => wave.render(T, ctx));
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `Simply click <span class="em">G</span> to start recording...`;
+              const img = document.createElement("div");
+              img.className = "topbar G";
+              return [text, img];
+            },
+            render: (T, t, ctx) => {
+              waves.forEach((wave, i) => {
+                wave.visibility = Math.max(0, 1 - t * 4);
+                wave.render(T, ctx);
+              });
+              frame.offset = -20 + Math.min((t / 0.25) * 50, 50);
+              frame.render(T, ctx);
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `<span>...and click</span><span class="stop" aria-label="stop"></span><span>when you're done.</span>`;
+              const img = document.createElement("div");
+              img.className = "topbar stop";
+              return [text, img];
+            },
+            render: (T, t, ctx) => {
+              cropper.render(T, ctx);
+              frame.offset = 30 - Math.min((t / 0.25) * 50, 50);
+              frame.render(T, ctx);
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `Afterwards, you can quickly <span class="em">crop</span>...`;
+              return [text];
+            },
+            render: (T, t, ctx) => {
+              const startingHeight = canvas.height;
+              const startingWidth = canvas.width;
+              const desiredHeight = startingHeight * 0.72;
+              const desiredWidth =
+                canvas.width < 1400
+                  ? startingWidth * 0.92
+                  : startingWidth * 0.8;
+
+              const currentHeight =
+                startingHeight +
+                (desiredHeight - startingHeight) *
+                  easeOutQuad(Math.min(t * 8, 1));
+              const currentWidth =
+                startingWidth +
+                (desiredWidth - startingWidth) *
+                  easeOutQuad(Math.min(Math.max((t - 1 / 8) * 8, 0), 1));
+
+              const start = [
+                (canvas.width - currentWidth) / 2,
+                (canvas.height - currentHeight) / 2,
+              ];
+
+              const end = [
+                (canvas.width + currentWidth) / 2,
+                (canvas.height + currentHeight) / 2,
+              ];
+
+              cropper.start = start;
+              cropper.end = end;
+              cropper.render(T, ctx);
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `...and <span class="em">trim</span>.`;
+              return [text];
+            },
+            render: (T, t, ctx) => {
+              const startingHeight = canvas.height * 0.8;
+              const startingWidth =
+                canvas.width < 1600 ? canvas.width * 0.92 : canvas.width * 0.8;
+              const desiredHeight = 300;
+              const desiredWidth = startingWidth;
+
+              const currentHeight =
+                startingHeight +
+                (desiredHeight - startingHeight) *
+                  easeOutQuad(Math.min(t * 8, 1));
+              const currentWidth =
+                startingWidth +
+                (desiredWidth - startingWidth) *
+                  Math.min(Math.max((t - 1 / 8) * 8, 0), 1);
+
+              const heightOffset = 400 * easeOutQuad(Math.min(t * 8, 1));
+
+              const start = [
+                (canvas.width - currentWidth) / 2,
+                (canvas.height - currentHeight) / 2 + heightOffset,
+              ];
+
+              const end = [
+                (canvas.width + currentWidth) / 2,
+                (canvas.height + currentHeight) / 2 + heightOffset,
+              ];
+
+              cropper.start = start;
+              cropper.end = end;
+              cropper.trimmer = easeOutQuad(Math.min(t * 8, 1));
+              cropper.render(t, ctx);
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `And then export to <span class="em">gif</span> or <span class="em">mp4</span>.`;
+              return [text];
+            },
+            render: (T, t, ctx) => {
+              const startingHeight = 300;
+              const startingWidth = canvas.width * 0.8;
+              const desiredHeight = 105;
+              const desiredWidth = 400;
+
+              const currentHeight =
+                startingHeight +
+                (desiredHeight - startingHeight) * Math.min(t * 8, 1);
+              const currentWidth =
+                startingWidth +
+                (desiredWidth - startingWidth) * Math.min(t * 8, 1);
+
+              const heightOffset = 400 - 100 * Math.min(t * 8, 1);
+
+              const start = [
+                (canvas.width - currentWidth) / 2,
+                (canvas.height - currentHeight) / 2 + heightOffset,
+              ];
+
+              const end = [
+                (canvas.width + currentWidth) / 2,
+                (canvas.height + currentHeight) / 2 + heightOffset,
+              ];
+
+              cropper.start = start;
+              cropper.end = end;
+
+              cropper.trimmer = 1;
+              cropper.button = Math.min(t * 8, 1);
+              // cropper.trimmer = 1 - Math.min(t * 8, 1);
+              cropper.render(t, ctx);
+            },
+          },
+          {
+            setup: () => {
+              const text = document.createElement("span");
+              text.className = "text";
+              text.innerHTML = `Ready to try?`;
+              const link = document.createElement("a");
+              link.className = "download fade";
+              link.innerHTML = `<svg
+	 viewBox="0 0 22.773 22.773">
+	<g>
+		<path d="M15.769,0c0.053,0,0.106,0,0.162,0c0.13,1.606-0.483,2.806-1.228,3.675c-0.731,0.863-1.732,1.7-3.351,1.573
+			c-0.108-1.583,0.506-2.694,1.25-3.561C13.292,0.879,14.557,0.16,15.769,0z"/>
+		<path d="M20.67,16.716c0,0.016,0,0.03,0,0.045c-0.455,1.378-1.104,2.559-1.896,3.655c-0.723,0.995-1.609,2.334-3.191,2.334
+			c-1.367,0-2.275-0.879-3.676-0.903c-1.482-0.024-2.297,0.735-3.652,0.926c-0.155,0-0.31,0-0.462,0
+			c-0.995-0.144-1.798-0.932-2.383-1.642c-1.725-2.098-3.058-4.808-3.306-8.276c0-0.34,0-0.679,0-1.019
+			c0.105-2.482,1.311-4.5,2.914-5.478c0.846-0.52,2.009-0.963,3.304-0.765c0.555,0.086,1.122,0.276,1.619,0.464
+			c0.471,0.181,1.06,0.502,1.618,0.485c0.378-0.011,0.754-0.208,1.135-0.347c1.116-0.403,2.21-0.865,3.652-0.648
+			c1.733,0.262,2.963,1.032,3.723,2.22c-1.466,0.933-2.625,2.339-2.427,4.74C17.818,14.688,19.086,15.964,20.67,16.716z"/>
+	</g>
+</svg>
+ <div>Download for Mac</div>`;
+              link.href = "#";
+              return [text, link];
+            },
+            render: (T, t, ctx) => {
+              waves.forEach((wave, i) => {
+                wave.visibility = Math.min(t * 4, 1);
+                wave.render(T, ctx);
+              });
+
+              //clean up
+              cropper.trimmer = 0;
+              cropper.button = 0;
+              cropper.start = [0, 0];
+              cropper.end = [canvas.width, canvas.height];
+            },
+          },
+        ];
+
+        const container = document.querySelector("#gerry");
+        let elements = [];
+        let currentStage = stages[0];
+        let stageStartT = 0;
+
+        const activateStage = (i) => {
+          currentStage = stages[i];
+          stageStartT = performance.now();
+          elements = currentStage.setup();
+          elements.forEach((el) => container.appendChild(el));
+          // if (i < stages.length - 1) {
+          setTimeout(() => {
+            elements.forEach((el) => container.removeChild(el));
+            activateStage((i + 1) % stages.length);
+          }, 4000);
+          // }
+        };
+
+        activateStage(0);
+
+        const render = (T) => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const t = (T - stageStartT) / 4000;
+          currentStage.render && currentStage.render(T, t, ctx);
+          // waves.forEach((wave, i) => wave.render(t, ctx));
+          // if (t < 3000) {
+          //   if (t > 2000) {
+          //     frame.offset = 20 - ((t - 2000) / 1000) * 40;
+          //   }
+          //   frame.render(t, ctx);
+          // }
+          // cropper.render(t, ctx);
+          window.requestAnimationFrame(render);
+        };
+        render(0);
+      });
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <nav class="fixed">
+      <div class="left">
+        <a class="title" href="/">Gerry</a>
+        <a class="about" href="/about">About</a>
+      </div>
+      <a class="nav-download" href="/about#download">Download</a>
+    </nav>
+    <canvas id="canvas"></canvas>
+    <div id="gerry"></div>
+  </body>
+</html>
