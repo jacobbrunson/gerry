@@ -61,8 +61,6 @@ class TrimmerViewController: NSViewController {
         playheadView.update(t: min(1, currentTime.seconds / asset!.duration.seconds))
         if self.cropRect != cropRect {
             self.cropRect = cropRect
-            timelineView.thumbs = []
-            timelineView.setNeedsDisplay(timelineView.frame)
             thumbnailController!.requestThumbnails(frameSize: timelineView.frame.size, cropRect: cropRect, shouldDebounce: true)
         }
     }
