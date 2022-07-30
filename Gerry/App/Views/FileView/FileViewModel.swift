@@ -67,7 +67,7 @@ extension FileView {
 
         var outputFolderPath: String {
             get { outputFolder?.path ?? "" }
-            set { outputFolder = newValue.isEmpty ? nil : URL(string: newValue) }
+            set { }
         }
     }
 }
