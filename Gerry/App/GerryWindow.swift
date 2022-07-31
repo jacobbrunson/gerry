@@ -33,7 +33,7 @@ class GerryWindowController: NSWindowController, NSWindowDelegate {
     var shouldClose: ((_ windowController: GerryWindowController) -> Bool)?
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-       return  shouldClose == nil ? true : shouldClose!(self)
+       shouldClose == nil ? true : shouldClose!(self)
     }
     
     var onClose: ((_ windowController: GerryWindowController) -> ())?

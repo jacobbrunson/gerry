@@ -44,7 +44,7 @@ class GerryController {
                 let view = SaveWindowContentView(assetURL: videoURL, onExport: { [weak self] in
                     self?.unsavedVideos.remove(videoURL)
                 })
-                let windowController = view.openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: 1920, height: 1080))
+                let windowController = view.openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
                 self.openWindows += 1
                 self.windowControllers.insert(windowController)
                 self.unsavedVideos.insert(videoURL)
