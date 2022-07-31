@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		16697C7D2895A1AC0081FE5C /* G.png in Resources */ = {isa = PBXBuildFile; fileRef = 16697C7C2895A1AC0081FE5C /* G.png */; };
 		16A7203828851467004D84E2 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A7203728851467004D84E2 /* AVKit.framework */; };
+		16A9E2982896FF0400A71C00 /* SaveWindowContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A9E2972896FF0400A71C00 /* SaveWindowContentView.swift */; };
+		16A9E29A2896FF2E00A71C00 /* SaveWindowContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */; };
 		6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */; };
 		603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603546C2361A09FCC2501462 /* VertexCropHandle.swift */; };
 		603542C92AFE698947A5B04C /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354E933ADC961B34692731 /* Exporter.swift */; };
 		6035435E4BF009B108AA12D6 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 6035444B2193FBAA5B990CE8 /* stop.png */; };
 		603543D6A2C60DD1C74EC34F /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035424823C715217ACA27F1 /* StatusBarController.swift */; };
-		603543EED56FA31736F312A1 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354579162CD6E2B3BEC288 /* ExportView.swift */; };
 		6035443A6BBC41430D363E7C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035493937EF35CB1E00D39F /* AppDelegate.swift */; };
 		603544DBC9BC8B718390629A /* FileNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354AD3C1D7C01651A8D8D9 /* FileNameView.swift */; };
 		6035451653AD6DA412F4FD79 /* ScreenCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */; };
@@ -43,6 +44,8 @@
 /* Begin PBXFileReference section */
 		16697C7C2895A1AC0081FE5C /* G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = G.png; sourceTree = "<group>"; };
 		16A7203728851467004D84E2 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		16A9E2972896FF0400A71C00 /* SaveWindowContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveWindowContentView.swift; sourceTree = "<group>"; };
+		16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveWindowContentViewModel.swift; sourceTree = "<group>"; };
 		603540C3D545D8773CA98C11 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		6035416FE85A902E9C3C5EE7 /* Gerry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gerry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GerryWindow.swift; sourceTree = "<group>"; };
@@ -50,7 +53,6 @@
 		60354350E14CDE2F25F7ED86 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		6035440FE28892D775FC9807 /* EdgeCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EdgeCropHandle.swift; sourceTree = "<group>"; };
 		6035444B2193FBAA5B990CE8 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
-		60354579162CD6E2B3BEC288 /* ExportView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		603546418019998302B6B71C /* Gerry.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Gerry.entitlements; sourceTree = "<group>"; };
 		6035467BD4AB1EDC497F19FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		603546C2361A09FCC2501462 /* VertexCropHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VertexCropHandle.swift; sourceTree = "<group>"; };
@@ -173,12 +175,12 @@
 		60354CDAB5B0D3AC229375C7 /* FileView */ = {
 			isa = PBXGroup;
 			children = (
+				60354EA6FDD9CB3ABD18EBE8 /* FileViewModel.swift */,
 				60354AD3C1D7C01651A8D8D9 /* FileNameView.swift */,
 				60354F70F68DCAE175DA7043 /* FileQualityView.swift */,
 				603547563F61BCA752D74497 /* FileSaveView.swift */,
 				60354D763B9B119409E73A01 /* FileView.swift */,
 				60354BF2B1A1E051C99CFDF9 /* HighlightTextView.swift */,
-				60354EA6FDD9CB3ABD18EBE8 /* FileViewModel.swift */,
 			);
 			path = FileView;
 			sourceTree = "<group>";
@@ -207,7 +209,8 @@
 		60354F868B0CA7B90DCA1D5F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				60354579162CD6E2B3BEC288 /* ExportView.swift */,
+				16A9E2972896FF0400A71C00 /* SaveWindowContentView.swift */,
+				16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */,
 				603547A98B4BB45007D62C9C /* PlayerCropperView */,
 				60354CDAB5B0D3AC229375C7 /* FileView */,
 				60354E5010903D8FC9F1A11E /* TrimmerView */,
@@ -294,11 +297,11 @@
 				6035451653AD6DA412F4FD79 /* ScreenCaptureController.swift in Sources */,
 				603549D1FD0DD94B75D2D71E /* GerryController.swift in Sources */,
 				603549133523CD98D6CF6D9F /* GerryWindow.swift in Sources */,
-				603543EED56FA31736F312A1 /* ExportView.swift in Sources */,
 				603545EC084029EEB02CFF38 /* PlayerCropperView.swift in Sources */,
 				60354C86147735E33BA748FB /* CropHandle.swift in Sources */,
 				603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */,
 				60354B25B2C57C93B1EEEE59 /* EdgeCropHandle.swift in Sources */,
+				16A9E29A2896FF2E00A71C00 /* SaveWindowContentViewModel.swift in Sources */,
 				603544DBC9BC8B718390629A /* FileNameView.swift in Sources */,
 				6035484818ECC285CC46ABFC /* FileQualityView.swift in Sources */,
 				603548369EE7787893171CCA /* FileSaveView.swift in Sources */,
@@ -310,6 +313,7 @@
 				60354CCA34D10FD907904FD8 /* TimelineView.swift in Sources */,
 				603542C92AFE698947A5B04C /* Exporter.swift in Sources */,
 				60354E38985F81E1744B895B /* GifExporter.swift in Sources */,
+				16A9E2982896FF0400A71C00 /* SaveWindowContentView.swift in Sources */,
 				60354AAEA5283D2E3BF6958D /* Mp4Exporter.swift in Sources */,
 				6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */,
 				60354D9F1C9FEC19409F024F /* FileViewModel.swift in Sources */,

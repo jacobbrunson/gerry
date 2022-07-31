@@ -7,18 +7,14 @@ import SwiftUI
 import AVFoundation
 
 struct FileSaveView: View {
-    @ObservedObject var viewModel: FileView.ViewModel
+    @ObservedObject var fileViewModel: FileView.ViewModel
+    @ObservedObject var saveWindowViewModel: SaveWindowContentView.ViewModel
 
-    let videoURL: URL
-    let cropRect: CGRect?
-    let startT: CGFloat
-    let endT: CGFloat
-    @Binding var saveProgress: Double?
     let onExport: () -> ()
 
     private func export(using exporter: Exporter) async {
-        let outputFolder = viewModel.outputFolder!
-        let fileName = viewModel.fileName
+        let outputFolder = fileViewModel.outputFolder!
+        let fileName = fileViewModel.fileName
         let outputURL = exporter.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
         let fileExists = FileManager.default.fileExists(atPath: outputURL.path)
@@ -28,7 +24,7 @@ struct FileSaveView: View {
             let fileExistsAction = UserDefaults.standard.value(forKey: "fileExistsAction") as? String
 
             if fileExistsAction == "cancel" {
-                saveProgress = nil
+                saveWindowViewModel.saveProgress = nil
                 return
             }
 
@@ -48,27 +44,27 @@ struct FileSaveView: View {
                 }
 
                 if shouldCancel  {
-                    saveProgress = nil
+                    saveWindowViewModel.saveProgress = nil
                     return
                 }
             }
         }
 
-        saveProgress = 0
-        viewModel.regenerateDefaultFileName()
+        saveWindowViewModel.saveProgress = 0
+        fileViewModel.regenerateDefaultFileName()
 
         let result = await exporter.export(
-                videoAt: videoURL,
+                videoAt: saveWindowViewModel.assetURL,
                 toFolder: outputFolder,
                 withName: fileName,
-                croppingTo: cropRect,
-                startingAt: startT,
-                endingAt: endT,
-                withScale: 1.0/viewModel.scaleDivisor,
-                withFrameRate: CGFloat(viewModel.frameRate),
-                onProgress: { if saveProgress != nil { saveProgress = $0 } }
+                croppingTo: saveWindowViewModel.cropRect,
+                startingAt: saveWindowViewModel.startT,
+                endingAt: saveWindowViewModel.endT,
+                withScale: 1.0/fileViewModel.scaleDivisor,
+                withFrameRate: CGFloat(fileViewModel.frameRate),
+                onProgress: { if saveWindowViewModel.saveProgress != nil { saveWindowViewModel.saveProgress = $0 } }
         )
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveProgress = nil }
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveWindowViewModel.saveProgress = nil }
         onExport()
         print(result)
     }
@@ -80,7 +76,7 @@ struct FileSaveView: View {
                     await export(using: GifExporter())
                 }
             }) {
-                if viewModel.frameRate > 30 {
+                if fileViewModel.frameRate > 30 {
                     VStack {
                         Text("gif").font(.title)
                         Text("30 fps").font(.footnote)
@@ -95,7 +91,7 @@ struct FileSaveView: View {
                 }
 
             }
-                    .disabled(saveProgress != nil)
+                    .disabled(saveWindowViewModel.saveProgress != nil)
                     .buttonStyle(PlainButtonStyle())
                     .cornerRadius(10)
                     .foregroundColor(Color("DarkText"))
@@ -111,7 +107,7 @@ struct FileSaveView: View {
                         .background(Color("Yellow"))
                         .foregroundColor(Color("DarkText"))
                         .cornerRadius(10)
-            }.disabled(saveProgress != nil).buttonStyle(PlainButtonStyle())
+            }.disabled(saveWindowViewModel.saveProgress != nil).buttonStyle(PlainButtonStyle())
         }.padding()
     }
 }

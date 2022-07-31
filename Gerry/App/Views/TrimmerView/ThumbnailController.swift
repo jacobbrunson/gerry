@@ -11,14 +11,14 @@ class ThumbnailController {
 
     private let asset: AVAsset
     private let onThumbReady: ((CGImage, CGRect) -> ())?
-    private let onComplete: (() -> ())?
+    private let onComplete: ((_ thumbs: [CGImage]) -> ())?
 
     private var prevThumbs: [CGImage] = []
     private var currentThumbs: [CGImage] = []
     private var generator: AVAssetImageGenerator
     private var generationTimer: Timer?
 
-    init(asset: AVAsset, onThumbReady: ((CGImage, CGRect) -> ())?, onComplete: (() -> ())?) {
+    init(asset: AVAsset, onThumbReady: ((CGImage, CGRect) -> ())?, onComplete: ((_ thumbs: [CGImage]) -> ())?) {
         self.asset = asset
         self.onThumbReady = onThumbReady
         self.onComplete = onComplete
@@ -90,7 +90,7 @@ class ThumbnailController {
             if i == thumbCount {
                 self.isGenerating = false
                 DispatchQueue.main.async {
-                    self.onComplete?()
+                    self.onComplete?(self.currentThumbs)
                 }
             }
         }

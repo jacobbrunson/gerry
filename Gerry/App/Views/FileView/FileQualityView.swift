@@ -7,16 +7,15 @@ import SwiftUI
 
 struct FileQualityView: View {
 
-    @ObservedObject var viewModel: FileView.ViewModel
-
-    let cropRect: CGRect?
-
+    @ObservedObject var fileViewModel: FileView.ViewModel
+    @ObservedObject var saveWindowViewModel: SaveWindowContentView.ViewModel
 
     var body: some View {
+        let cropRect = saveWindowViewModel.cropRect
         let resolution = cropRect == nil ? nil : CGSize(width: cropRect!.width, height: cropRect!.height)
         return VStack {
             HStack {
-                Picker(selection: $viewModel.frameRate, label: Text("Frame rate").frame(width: 70)) {
+                Picker(selection: $fileViewModel.frameRate, label: Text("Frame rate").frame(width: 70)) {
                     Text("60 FPS (mp4 only)").tag(60)
                     Text("30 FPS").tag(30)
                     Text("24 FPS").tag(24)
@@ -25,7 +24,7 @@ struct FileQualityView: View {
                 }
             }
             HStack {
-                Picker(selection: $viewModel.scaleDivisor, label: Text("Resolution").frame(width: 70)) {
+                Picker(selection: $fileViewModel.scaleDivisor, label: Text("Resolution").frame(width: 70)) {
                     ResolutionTextView(resolution: resolution, divisor: 1.0)
                     ResolutionTextView(resolution: resolution, divisor: 2.0)
                     ResolutionTextView(resolution: resolution, divisor: 4.0)

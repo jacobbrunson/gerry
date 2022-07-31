@@ -6,17 +6,17 @@ import Foundation
 import SwiftUI
 
 struct FileNameView: View {
-    @ObservedObject var viewModel: FileView.ViewModel
+    @ObservedObject var fileViewModel: FileView.ViewModel
 
     var body: some View {
         VStack {
             HStack {
                 Text("Output folder").frame(width: 90, alignment: .leading)
-                TextField("", text: $viewModel.outputFolderPath).disabled(true)
+                TextField("", text: $fileViewModel.outputFolderPath).disabled(true)
                 Button(action: {
                     Task {
                         let selectedURL =  await selectFolder()
-                        viewModel.outputFolder = selectedURL
+                        fileViewModel.outputFolder = selectedURL
 
                         // Persist this URL and its associated security data in a "bookmark"
                         if let bookmark = try? selectedURL.bookmarkData(
@@ -34,7 +34,7 @@ struct FileNameView: View {
             }
             HStack {
                 Text("File name").frame(width: 90, alignment: .leading)
-                HighlightTextField(text: $viewModel.fileName)
+                HighlightTextField(text: $fileViewModel.fileName)
                 Spacer()
             }
         }.padding().frame(width: 400)

@@ -11,14 +11,14 @@ enum TrimmerHandlePosition {
 }
 
 class TrimmerHandleView: NSView {
-    let width: CGFloat = 12
+    static let width: CGFloat = 12
 
     var position: TrimmerHandlePosition = .left
     var t: CGFloat = 0
     var onUpdate: (CGFloat) -> () = { _ in }
 
     var widthT: CGFloat {
-        superview == nil ? 0 : width / superview!.frame.width
+        superview == nil ? 0 : TrimmerHandleView.width / superview!.frame.width
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -26,8 +26,8 @@ class TrimmerHandleView: NSView {
             return
         }
 
-        let x = t * superview!.frame.width + (position == .right ? -width : 0)
-        frame = CGRect(x: x, y: 0, width: width, height: superview!.frame.height)
+        let x = t * superview!.frame.width + (position == .right ? -TrimmerHandleView.width : 0)
+        frame = CGRect(x: x, y: 0, width: TrimmerHandleView.width, height: superview!.frame.height)
 
         context.saveGState()
         context.addRect(frame)
@@ -42,7 +42,7 @@ class TrimmerHandleView: NSView {
         let lowerBound = position == .left ? 0 : widthT * 2
         let upperBound = position == .left ? 1 - widthT * 2 : 1
 
-        let t = min(max(lowerBound, t + deltaT), upperBound)
+        t = min(max(lowerBound, t + deltaT), upperBound)
         onUpdate(t)
         superview!.setNeedsDisplay(superview!.frame)
     }

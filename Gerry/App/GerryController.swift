@@ -15,10 +15,12 @@ class GerryController {
     var openWindows = 0
 
     var unsavedVideos: Set<URL> = []
-    var windowVideos: [NSWindow: URL] = [:]
+
+    var windowControllers: Set<NSWindowController> = []
 
     init() {
         NSApp.setActivationPolicy(.accessory)
+        openSaveWindow(videoURL: URL(fileURLWithPath: "/Users/jacob/Downloads/skates.mp4"))
         statusBarController.clickHandler = {
             if self.state == .idle {
                 await self.openWindowsDialog()
@@ -37,35 +39,40 @@ class GerryController {
         DispatchQueue.main.async {
             Task {
                 let display = await self.screenCaptureController.getDisplay()
-                let window = ExportView(videoURL: videoURL, onExport: {
-                    self.unsavedVideos.remove(videoURL)
-                }).openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
+                let view = SaveWindowContentView(assetURL: videoURL, onExport: { [weak self] in
+                    self?.unsavedVideos.remove(videoURL)
+                })
+                let windowController = view.openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: 1920, height: 1080))
                 self.openWindows += 1
+                self.windowControllers.insert(windowController)
                 self.unsavedVideos.insert(videoURL)
-                window.shouldClose = {
-                    if self.unsavedVideos.contains(videoURL) {
-                        self.unsavedVideoDialog(window: window)
+                windowController.shouldClose = { [weak self] windowController in
+                    guard let unsavedVideos = self?.unsavedVideos else { return true }
+                    if unsavedVideos.contains(videoURL) {
+                        self!.unsavedVideoDialog(windowController: windowController)
                         return false
                     }
                     return true
                 }
-                window.onClose = {
-                    self.openWindows -= 1
-                    self.unsavedVideos.remove(videoURL)
-                    if self.openWindows == 0 {
+                windowController.onClose = { [weak self] windowController in
+                    guard self != nil else { return }
+                    self!.windowControllers.remove(windowController)
+                    self!.openWindows -= 1
+                    self!.unsavedVideos.remove(videoURL)
+                    if self!.openWindows == 0 {
                         NSApp.setActivationPolicy(.accessory)
                     }
                 }
-                NotificationCenter.default.addObserver(window, selector: #selector(GerryWindow.windowWillClose), name: NSWindow.willCloseNotification, object: window)
+
             }
         }
     }
 
-    private func unsavedVideoDialog(window: NSWindow) {
+    private func unsavedVideoDialog(windowController: GerryWindowController) {
         let unsavedVideoAction = UserDefaults.standard.value(forKey: "unsavedVideoAction") as? String
 
         if unsavedVideoAction == "close" {
-            window.close()
+            windowController.close()
         } else if unsavedVideoAction == nil {
             DispatchQueue.main.async {
                 let alert = NSAlert()
@@ -83,7 +90,7 @@ class GerryController {
                 }
 
                 if shouldClose {
-                    window.close()
+                    windowController.close()
                 }
             }
         }

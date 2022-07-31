@@ -7,9 +7,9 @@ import AppKit
 import AVFoundation
 
 class TimelineView: NSView {
-    var leftHandleView: TrimmerHandleView?
-    var rightHandleView: TrimmerHandleView?
-    var playheadView: PlayheadView?
+    weak var leftHandleView: TrimmerHandleView?
+    weak var rightHandleView: TrimmerHandleView?
+    weak var playheadView: PlayheadView?
     var thumbs: [CGImage] = []
     var currentTime = CMTime.zero
     var duration = CMTime.zero
