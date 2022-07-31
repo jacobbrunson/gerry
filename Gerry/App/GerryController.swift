@@ -108,12 +108,12 @@ class GerryController {
                         let alert = NSAlert()
                         alert.messageText = "Close Gerry window\(self.openWindows > 1 ? "s" : "")?"
                         alert.informativeText = "You have \(self.openWindows > 1 ? String(self.openWindows) : "a") Gerry save window\(self.openWindows > 1 ? "s" : "") open, which can reduce performance. For the smoothest video, close all Gerry windows."
-                        alert.addButton(withTitle: "Don't close")
                         alert.addButton(withTitle: "Close \(self.openWindows) Gerry window\(self.openWindows > 1 ? "s" : "")")
+                        alert.addButton(withTitle: "Don't close")
                         alert.alertStyle = .warning
                         alert.showsSuppressionButton = true
 
-                        let shouldClose = alert.runModal() == NSApplication.ModalResponse.alertSecondButtonReturn
+                        let shouldClose = alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
 
                         if alert.suppressionButton?.state.rawValue == 1 {
                             UserDefaults.standard.set(shouldClose ? "close" : "no-close", forKey: "openWindowsAction")
