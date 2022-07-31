@@ -17,6 +17,7 @@ class StatusBarController {
         if let statusBarButton = statusItem.button {
             setStatusBarButtonImage(imageLiteralResourceName: getIconName(.idle))
             statusBarButton.action = #selector(onClick(sender:))
+            statusBarButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
             statusBarButton.target = self
         }
     }
@@ -39,10 +40,17 @@ class StatusBarController {
     }
 
     @objc private func onClick(sender: AnyObject)  {
-        if clickHandler != nil {
-            Task {
-                await clickHandler!()
+        let event = NSApp.currentEvent!
+
+        if event.type == NSEvent.EventType.leftMouseUp {
+            if clickHandler != nil && statusItem.menu == nil {
+                Task {
+                    await clickHandler!()
+                }
             }
+        } else {
+            constructMenu()
+            statusItem.button?.performClick(nil)
         }
     }
 
@@ -52,5 +60,22 @@ class StatusBarController {
             statusItem.button?.image?.size = NSSize(width: 18.0, height: 18.0)
             statusBarButton.image?.isTemplate = true
         }
+    }
+
+    func constructMenu() {
+        let menu = GerryMenu()
+        menu.addItem(NSMenuItem(title: "Quit Gerry", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.delegate = menu
+        menu.statusItem = statusItem
+        statusItem.menu = menu
+    }
+}
+
+class GerryMenu: NSMenu, NSMenuDelegate {
+    var statusItem: NSStatusItem?
+
+    @objc
+    func menuDidClose(_ menu: NSMenu) {
+        statusItem?.menu = nil
     }
 }
