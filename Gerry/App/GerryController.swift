@@ -20,22 +20,24 @@ class GerryController {
 
     init() {
         NSApp.setActivationPolicy(.accessory)
-        openSaveWindow(videoURL: URL(fileURLWithPath: "/Users/jacob/Downloads/skates.mp4"))
-        statusBarController.clickHandler = {
-            if self.state == .idle {
-                await self.openWindowsDialog()
-                self.transition(to: .loading)
-                await self.screenCaptureController.beginRecording()
-                self.transition(to: .recording)
-            } else if self.state == .recording {
-                let videoURL = await self.screenCaptureController.stopRecording()
-                self.transition(to: .idle)
-                self.openSaveWindow(videoURL: videoURL)
+        statusBarController.onClick = { [unowned self] in
+            if state == .idle {
+                await openWindowsDialog()
+                transition(to: .loading)
+                await screenCaptureController.beginRecording()
+                transition(to: .recording)
+            } else if state == .recording {
+                let videoURL = await screenCaptureController.stopRecording()
+                transition(to: .idle)
+                openSaveWindow(videoURL: videoURL)
             }
+        }
+        statusBarController.onOpen = { [unowned self] selectedUrl in
+            openSaveWindow(videoURL: selectedUrl)
         }
     }
 
-    private func openSaveWindow(videoURL: URL) {
+    public func openSaveWindow(videoURL: URL) {
         DispatchQueue.main.async {
             Task {
                 let display = await self.screenCaptureController.getDisplay()
