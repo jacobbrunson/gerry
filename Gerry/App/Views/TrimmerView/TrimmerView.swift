@@ -90,6 +90,7 @@ class TrimmerViewController: NSViewController {
 
         timelineView.leftHandleView = leftHandleView
         timelineView.rightHandleView = rightHandleView
+        timelineView.playheadView = playheadView
         timelineView.subviews = [leftHandleView, rightHandleView, playheadView]
 
         asset = AVAsset(url: mediaURL)

@@ -25,7 +25,7 @@ class PlayheadView: NSView {
 
         context.saveGState()
         context.addRect(CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
-        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+        context.setFillColor(CGColor(red: 1, green: 0.8, blue: 0, alpha: 1))
         context.drawPath(using: .fill)
         context.restoreGState()
     }
