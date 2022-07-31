@@ -5,6 +5,7 @@
 import Foundation
 import AppKit
 import SwiftUI
+import CoreGraphics
 
 class GerryController {
     let screenCaptureController = ScreenCaptureController()
@@ -19,6 +20,9 @@ class GerryController {
     var windowControllers: Set<NSWindowController> = []
 
     init() {
+        if !CGPreflightScreenCaptureAccess() {
+            CGRequestScreenCaptureAccess()
+        }
         NSApp.setActivationPolicy(.accessory)
         statusBarController.onClick = { [unowned self] in
             if state == .idle {
