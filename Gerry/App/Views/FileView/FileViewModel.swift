@@ -47,7 +47,7 @@ extension FileView {
 
         // Output folder
         @Published private var selectedOutputFolder: URL?
-        private let defaultOutputFolder = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+        private let defaultOutputFolder = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0]
 
         private var userDefaultOutputFolder: URL? {
             guard let bookmarkData = UserDefaults.standard.data(forKey: "outputFolder") else { return nil }
