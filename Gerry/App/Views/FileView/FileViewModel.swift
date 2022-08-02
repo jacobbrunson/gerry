@@ -47,7 +47,9 @@ extension FileView {
 
         // Output folder
         @Published private var selectedOutputFolder: URL?
-        private let defaultOutputFolder = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0]
+        private let defaultOutputFolder =
+                FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("Gerry", isDirectory: true)
 
         private var userDefaultOutputFolder: URL? {
             guard let bookmarkData = UserDefaults.standard.data(forKey: "outputFolder") else { return nil }
@@ -61,7 +63,9 @@ extension FileView {
         }
 
         var outputFolder: URL? {
-            get { selectedOutputFolder ?? userDefaultOutputFolder ?? defaultOutputFolder }
+            get {
+                selectedOutputFolder ?? userDefaultOutputFolder ?? defaultOutputFolder
+            }
             set { selectedOutputFolder = newValue }
         }
 
@@ -79,9 +83,10 @@ extension FileView {
         ]
         
         func friendlyPath(for url: URL) -> String {
-            for (directory, name) in ViewModel.pathNames {
-                if url.path == FileManager.default.urls(for: directory, in: .userDomainMask)[0].path {
-                    return name
+            for (directory, friendlyName) in ViewModel.pathNames {
+                let basePath = FileManager.default.urls(for: directory, in: .userDomainMask)[0].path
+                if url.path.contains(basePath) {
+                    return url.path.replacingOccurrences(of: basePath, with: "~/\(friendlyName)")
                 }
             }
             
