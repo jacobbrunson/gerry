@@ -17,8 +17,10 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
     private var hasSession = false
 
     func beginRecording() async {
-        let display = await getDisplay()
-        let filter = getFilter(display)
+        let content = try! await SCShareableContent.excludingDesktopWindows(false,
+                onScreenWindowsOnly: false)
+        let display = content.displays.first!
+        let filter = getFilter(display: display, availableApps: content.applications)
         let configuration = getConfiguration(display)
 
         beginWriting(width: display.width * scale, height: display.height * scale)
@@ -63,19 +65,22 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
                               AVVideoHeightKey: NSNumber(value: height)] as [String : Any]
         input = AVAssetWriterInput(mediaType: .video, outputSettings: outputSettings)
 
-        writer?.add(input!);
-        writer?.startWriting()
+        writer!.add(input!);
+        writer!.startWriting()
     }
 
     public func getDisplay() async -> SCDisplay {
         let content = try! await SCShareableContent.excludingDesktopWindows(false,
-                onScreenWindowsOnly: true)
+                onScreenWindowsOnly: false)
         return content.displays[0];
     }
 
-    private func getFilter(_ display: SCDisplay) -> SCContentFilter {
-        SCContentFilter(display: display,
-                excludingApplications: [],
+    private func getFilter(display: SCDisplay, availableApps: [SCRunningApplication]) -> SCContentFilter {
+        let excludedApps = availableApps.filter { app in
+            Bundle.main.bundleIdentifier == app.bundleIdentifier
+        }
+        return SCContentFilter(display: display,
+                excludingApplications: excludedApps,
                 exceptingWindows: [])
     }
 

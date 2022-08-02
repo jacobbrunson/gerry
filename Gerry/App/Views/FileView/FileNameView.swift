@@ -50,6 +50,7 @@ struct FileNameView: View {
         folderPicker.canChooseDirectories = true
         folderPicker.canChooseFiles = false
         folderPicker.allowsMultipleSelection = false
+        folderPicker.directoryURL = fileViewModel.outputFolder
 
         return await withCheckedContinuation{ continuation in
             folderPicker.begin { response in

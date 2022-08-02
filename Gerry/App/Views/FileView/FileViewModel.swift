@@ -66,8 +66,27 @@ extension FileView {
         }
 
         var outputFolderPath: String {
-            get { outputFolder?.path ?? "" }
+            get { outputFolder == nil ? "" : friendlyPath(for: outputFolder!)}
             set { }
         }
+        
+        private static let pathNames: [FileManager.SearchPathDirectory: String] = [
+            .moviesDirectory: "Movies",
+            .desktopDirectory: "Desktop",
+            .downloadsDirectory: "Downloads",
+            .documentDirectory: "Documents",
+            .picturesDirectory: "Pictures",
+        ]
+        
+        func friendlyPath(for url: URL) -> String {
+            for (directory, name) in ViewModel.pathNames {
+                if url.path == FileManager.default.urls(for: directory, in: .userDomainMask)[0].path {
+                    return name
+                }
+            }
+            
+            return url.path
+        }
+    
     }
 }

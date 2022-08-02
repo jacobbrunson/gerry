@@ -55,10 +55,11 @@ class StatusBarController {
     }
 
     private func setStatusBarButtonImage(imageLiteralResourceName: String) {
-        if let statusBarButton = statusItem.button {
-            statusItem.button?.image = NSImage(imageLiteralResourceName: imageLiteralResourceName)
-            statusItem.button?.image?.size = NSSize(width: 18.0, height: 18.0)
-            statusBarButton.image?.isTemplate = true
+        DispatchQueue.main.async { [weak statusItem] in
+            guard let statusBarButton = statusItem?.button else { return }
+            statusBarButton.image = NSImage(imageLiteralResourceName: imageLiteralResourceName)
+            statusBarButton.image!.size = NSSize(width: 18.0, height: 18.0)
+            statusBarButton.image!.isTemplate = true
         }
     }
 
