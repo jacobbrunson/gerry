@@ -31,24 +31,24 @@ class Mp4Exporter: Exporter {
         let rect = maybeRect ?? CGRect(x: 0, y: 0, width: size.width, height: size.height)
         let scaledRect = CGRect(x: rect.minX * scale, y: size.height * scale - rect.minY * scale, width: rect.width * scale, height: rect.height * scale)
 
-        var videoComposition: AVMutableVideoComposition = AVMutableVideoComposition()
+        let videoComposition: AVMutableVideoComposition = AVMutableVideoComposition()
         videoComposition.frameDuration = CMTime(value: 1, timescale: Int32(desiredFrameRate))
         videoComposition.renderSize = CGSize(width: scaledRect.width, height: scaledRect.height)
 
-        var instruction: AVMutableVideoCompositionInstruction = AVMutableVideoCompositionInstruction()
+        let instruction: AVMutableVideoCompositionInstruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = clipVideoTrack.timeRange
 
-        var transformer: AVMutableVideoCompositionLayerInstruction =
+        let transformer: AVMutableVideoCompositionLayerInstruction =
                 AVMutableVideoCompositionLayerInstruction(assetTrack: clipVideoTrack)
 
-        var transform: CGAffineTransform = CGAffineTransform(scaleX: scale, y: scale).translatedBy(x: -rect.minX, y: rect.maxY - size.height)
+        let transform: CGAffineTransform = CGAffineTransform(scaleX: scale, y: scale).translatedBy(x: -rect.minX, y: rect.maxY - size.height)
 
         transformer.setTransform(transform, at: .zero)
 
         instruction.layerInstructions = [transformer]
         videoComposition.instructions = [instruction]
         
-        try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
+//        try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
         let outputURL = getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)!

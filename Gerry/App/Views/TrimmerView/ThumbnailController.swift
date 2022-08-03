@@ -63,7 +63,6 @@ class ThumbnailController {
         )
         generator.maximumSize = uncroppedSize
 
-        let tolerance = CMTime(seconds: 0.1, preferredTimescale: 10000)
         generator.requestedTimeToleranceBefore = .zero
         generator.requestedTimeToleranceAfter = .zero
 

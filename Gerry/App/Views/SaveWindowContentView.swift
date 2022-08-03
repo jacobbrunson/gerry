@@ -20,22 +20,18 @@ struct SaveWindowContentView: View {
 
     var body: some View {
         VStack {
-            if let player = viewModel.player {
-                PlayerCropperView(viewModel: viewModel)
-                Spacer(minLength: 24)
-                TrimmerView(viewModel: viewModel, onUpdate: { t, position in
-                    if position == .left {
-                        viewModel.startT = t
-                    } else {
-                        viewModel.endT = t
-                    }
-                    viewModel.player.seek(to: CMTime(seconds: viewModel.player.currentItem!.duration.seconds * t * 0.999999, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
-                    viewModel.player.play()
-                }).frame(height: 100)
-                ResponsiveLogoAndFile(viewModel: viewModel, onExport: onExport).frame(height: 100)
-            } else {
-                Text("No player")
-            }
+            PlayerCropperView(viewModel: viewModel)
+            Spacer(minLength: 24)
+            TrimmerView(viewModel: viewModel, onUpdate: { t, position in
+                if position == .left {
+                    viewModel.startT = t
+                } else {
+                    viewModel.endT = t
+                }
+                viewModel.player.seek(to: CMTime(seconds: viewModel.player.currentItem!.duration.seconds * t * 0.999999, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+                viewModel.player.play()
+            }).frame(height: 100)
+            ResponsiveLogoAndFile(viewModel: viewModel, onExport: onExport).frame(height: 100)
         }.background(GerryBackground(material: NSVisualEffectView.Material.underWindowBackground, blendingMode: .behindWindow, isEmphasized: true))
     }
 }
@@ -76,7 +72,9 @@ struct ResponsiveLogoAndFile: View {
                     fileView
                 }
                 if viewModel.saveProgress != nil {
-                    Rectangle().fill(Color("Yellow")).frame(width: availableWidth * viewModel.saveProgress!, height: 4).animation(.easeOut)
+                    withAnimation(.easeOut) {
+                        Rectangle().fill(Color("Yellow")).frame(width: availableWidth * viewModel.saveProgress!, height: 4)
+                    }
                 }
             }
 

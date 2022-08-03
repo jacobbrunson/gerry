@@ -21,16 +21,12 @@ extension SaveWindowContentView {
         var assetURL: URL {
             get { (avPlayer!.currentItem!.asset as! AVURLAsset).url }
             set {
-                if newValue == nil {
-                    avPlayer = nil
-                } else {
-                    let player = AVPlayer(url: newValue)
-                    player.isMuted = true
-                    player.allowsExternalPlayback = false
+                let player = AVPlayer(url: newValue)
+                player.isMuted = true
+                player.allowsExternalPlayback = false
 
-                    avPlayer = player
-                    player.play()
-                }
+                avPlayer = player
+                player.play()
             }
         }
 

@@ -30,7 +30,6 @@ class StatusBarController {
             statusBarButton.action = #selector(onClick(sender:))
             statusBarButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
             statusBarButton.target = self
-            statusBarButton
         }
     }
 
@@ -54,8 +53,8 @@ class StatusBarController {
         }
 
         if isPrimaryButton {
-            guard onClick != nil, statusItem.menu == nil else { return }
-            onRecord?()
+            guard onRecord != nil, statusItem.menu == nil else { return }
+            onRecord!()
         } else {
             constructMenu()
             statusItem.button?.performClick(nil)
