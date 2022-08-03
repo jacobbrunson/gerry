@@ -11,8 +11,6 @@ class GerryController {
     let screenCaptureController = ScreenCaptureController()
     let statusBarController = StatusBarController()
 
-    var state = GerryState.idle
-
     var openWindows = 0
 
     var unsavedVideos: Set<URL> = []
@@ -24,18 +22,23 @@ class GerryController {
             CGRequestScreenCaptureAccess()
         }
         NSApp.setActivationPolicy(.accessory)
-        statusBarController.onClick = { [unowned self] in
-            if state == .idle {
+
+        statusBarController.onRecord = { [unowned self] in
+            Task {
                 await openWindowsDialog()
-                transition(to: .loading)
+                statusBarController.isRecording = true
                 await screenCaptureController.beginRecording()
-                transition(to: .recording)
-            } else if state == .recording {
+            }
+        }
+
+        statusBarController.onStop = { [unowned self] in
+            Task {
                 let videoURL = await screenCaptureController.stopRecording()
-                transition(to: .idle)
+                statusBarController.isRecording = false
                 openSaveWindow(videoURL: videoURL)
             }
         }
+
         statusBarController.onOpen = { [unowned self] selectedUrl in
             openSaveWindow(videoURL: selectedUrl)
         }
@@ -149,16 +152,4 @@ class GerryController {
             }
         }
     }
-
-    private func transition(to: GerryState) {
-        state = to
-        statusBarController.updateIcon(state)
-    }
-}
-
-enum GerryState {
-    case idle
-    case loading
-    case recording
-    case saving
 }
