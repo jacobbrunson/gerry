@@ -7,10 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16373485289A2E37009B44A5 /* ScreenCaptureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16373483289A2B6D009B44A5 /* ScreenCaptureKit.framework */; };
 		16697C7D2895A1AC0081FE5C /* G.png in Resources */ = {isa = PBXBuildFile; fileRef = 16697C7C2895A1AC0081FE5C /* G.png */; };
 		16A7203828851467004D84E2 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A7203728851467004D84E2 /* AVKit.framework */; };
 		16A9E2982896FF0400A71C00 /* SaveWindowContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A9E2972896FF0400A71C00 /* SaveWindowContentView.swift */; };
 		16A9E29A2896FF2E00A71C00 /* SaveWindowContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */; };
+		16F50BAD289A309A0006576D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F50BAC289A309A0006576D /* CoreGraphics.framework */; };
+		16F50BAF289A30B70006576D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F50BAE289A30B70006576D /* AVFoundation.framework */; };
 		6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */; };
 		603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603546C2361A09FCC2501462 /* VertexCropHandle.swift */; };
 		603542C92AFE698947A5B04C /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354E933ADC961B34692731 /* Exporter.swift */; };
@@ -42,10 +45,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		16373483289A2B6D009B44A5 /* ScreenCaptureKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenCaptureKit.framework; path = System/Library/Frameworks/ScreenCaptureKit.framework; sourceTree = SDKROOT; };
 		16697C7C2895A1AC0081FE5C /* G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = G.png; sourceTree = "<group>"; };
 		16A7203728851467004D84E2 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		16A9E2972896FF0400A71C00 /* SaveWindowContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveWindowContentView.swift; sourceTree = "<group>"; };
 		16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveWindowContentViewModel.swift; sourceTree = "<group>"; };
+		16F50BAC289A309A0006576D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		16F50BAE289A30B70006576D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		603540C3D545D8773CA98C11 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		6035416FE85A902E9C3C5EE7 /* Gerry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gerry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GerryWindow.swift; sourceTree = "<group>"; };
@@ -83,6 +89,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16F50BAF289A30B70006576D /* AVFoundation.framework in Frameworks */,
+				16F50BAD289A309A0006576D /* CoreGraphics.framework in Frameworks */,
+				16373485289A2E37009B44A5 /* ScreenCaptureKit.framework in Frameworks */,
 				16A7203828851467004D84E2 /* AVKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,6 +102,9 @@
 		16A7203628851467004D84E2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				16F50BAE289A30B70006576D /* AVFoundation.framework */,
+				16F50BAC289A309A0006576D /* CoreGraphics.framework */,
+				16373483289A2B6D009B44A5 /* ScreenCaptureKit.framework */,
 				16A7203728851467004D84E2 /* AVKit.framework */,
 			);
 			name = Frameworks;
