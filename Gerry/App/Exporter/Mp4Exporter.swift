@@ -47,7 +47,8 @@ class Mp4Exporter: Exporter {
 
         instruction.layerInstructions = [transformer]
         videoComposition.instructions = [instruction]
-
+        
+        try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
         let outputURL = getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)!

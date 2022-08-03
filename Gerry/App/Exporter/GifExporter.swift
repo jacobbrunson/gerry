@@ -36,9 +36,6 @@ class GifExporter: Exporter {
         let frameRate = min(desiredFrameRate, 30)
         let totalFrames = Int(totalDuration * TimeInterval(frameRate))
 
-        let duration = totalDuration * (endT - startT)
-
-
         var timeValues: [NSValue] = []
 
         let startFrame = Int(CGFloat(totalFrames)*startT)
@@ -71,7 +68,7 @@ class GifExporter: Exporter {
         ]
 
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).appendingPathExtension("gif")
-        let imageDestination = CGImageDestinationCreateWithURL(tempURL as CFURL, kUTTypeGIF, totalFrames, nil)!
+        let imageDestination = CGImageDestinationCreateWithURL(tempURL as CFURL, UTType.gif.identifier as CFString, totalFrames, nil)!
         CGImageDestinationSetProperties(imageDestination, fileProperties as CFDictionary)
 
         print("Converting to gif...")
@@ -93,13 +90,11 @@ class GifExporter: Exporter {
 
                 if resultingImage == nil {
                     print("Frame", framesProcessed, "/", frameCount, "failed")
-                    print(requestedTime.seconds, actualTime.seconds, result.rawValue, error)
                     if prevFrame != nil {
                         CGImageDestinationAddImage(imageDestination, prevFrame!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
                     }
                 } else {
                     print("Processed frame \(framesProcessed)/\(frameCount) (\(startFrame)-\(endFrame), \(totalFrames) total)")
-                    print(requestedTime.seconds, actualTime.seconds, result.rawValue, error)
                     CGImageDestinationAddImage(imageDestination, resultingImage!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
                     prevFrame = resultingImage
                 }
@@ -117,7 +112,8 @@ class GifExporter: Exporter {
                     let outputURL = self.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
 
                     let usingSecurityScope = outputFolder.startAccessingSecurityScopedResource()
-
+                    
+                    try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
                     try? FileManager.default.removeItem(at: outputURL);
                     try! FileManager.default.moveItem(at: tempURL, to: outputURL)
 
@@ -126,7 +122,6 @@ class GifExporter: Exporter {
                     }
 
                     if result {
-                        print("in a weird part of the night")
                         continuation.resume(returning: outputURL)
                     } else {
                         print("Gif export failed")
