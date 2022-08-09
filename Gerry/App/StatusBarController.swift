@@ -98,10 +98,16 @@ class StatusBarController {
                 isBoolean: true,
                 onEnable: {
                     let alert = NSAlert()
-                    alert.messageText = "One-click recording enabled!"
-                    alert.informativeText = "Now, clicking G will begin recording and right-clicking G will open the menu."
-                    alert.addButton(withTitle: "Ok")
-                    alert.runModal()
+                    alert.messageText = "Enable one-click recording?"
+                    alert.informativeText = "Left-click will begin recording. Right-click will open the menu."
+                    alert.addButton(withTitle: "Enable")
+                    alert.addButton(withTitle: "Cancel")
+                    
+                    NSApp.setActivationPolicy(.regular)
+                    NSApp.activate(ignoringOtherApps: true)
+                    
+                    let shouldEnable = alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+                    return shouldEnable
                 }
         ))
         menu.addItem(PreferenceMenuItem(
@@ -109,7 +115,7 @@ class StatusBarController {
                 preferenceKey: "unsavedVideoAction"
         ))
         menu.addItem(PreferenceMenuItem(
-                title: "Show \"open save window\" warning?",
+                title: "Show \"open save window\" warnings",
                 preferenceKey: "openWindowsAction"
         ))
 
@@ -122,12 +128,14 @@ class StatusBarController {
 class PreferenceMenuItem: NSMenuItem, NSMenuDelegate {
     var preferenceKey = ""
     var isBoolean = false
-    var onEnable: (() -> ())?
+    var onEnable = { false }
 
-    init(title: String, preferenceKey: String, isBoolean: Bool, onEnable: (() -> ())?) {
+    init(title: String, preferenceKey: String, isBoolean: Bool, onEnable: (() -> Bool)?) {
         self.preferenceKey = preferenceKey
         self.isBoolean = isBoolean
-        self.onEnable = onEnable
+        if onEnable != nil {
+            self.onEnable = onEnable!
+        }
         super.init(title: title, action: #selector(PreferenceMenuItem.onClick), keyEquivalent: "")
         target = self
 
@@ -151,11 +159,14 @@ class PreferenceMenuItem: NSMenuItem, NSMenuDelegate {
 
     @objc func onClick() {
         if isBoolean {
-            let isEnabled = savedPreference as? Bool == true
-            UserDefaults.standard.set(!isEnabled, forKey: preferenceKey)
-            if !isEnabled {
-                onEnable?()
+            let wasEnabled = savedPreference as? Bool == true
+            
+            if wasEnabled {
+                UserDefaults.standard.set(false, forKey: preferenceKey)
+            } else if onEnable() != false {
+                UserDefaults.standard.set(true, forKey: preferenceKey)
             }
+
         } else {
             UserDefaults.standard.removeObject(forKey: preferenceKey)
         }
