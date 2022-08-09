@@ -273,8 +273,16 @@ main .download {
   .screenshot {
     width: 80%;
   }
+}
 
-  main .download {
-    margin: 0 auto 40px;
-  }
+.app-store {
+  display: block;
+  height: 80px;
+  margin-bottom: 48px;
+}
+
+.app-store img {
+  height: 100%;
+  cursor: pointer;
+  user-select: none;
 }
