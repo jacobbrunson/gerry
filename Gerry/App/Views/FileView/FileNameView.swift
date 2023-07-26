@@ -7,9 +7,17 @@ import SwiftUI
 
 struct FileNameView: View {
     @ObservedObject var fileViewModel: FileView.ViewModel
+    @State private var isChecked = false
 
     var body: some View {
         VStack {
+            HStack {
+                Toggle(isOn: $fileViewModel.shouldCopyToClipboard) {
+                    Text("Copy to clipboard")
+                }
+                .toggleStyle(CheckboxToggleStyle())
+                .padding()
+            }
             HStack {
                 Text("Output folder").frame(width: 90, alignment: .leading)
                 TextField("", text: $fileViewModel.outputFolderPath).disabled(true)
@@ -29,12 +37,12 @@ struct FileNameView: View {
                     }
                 }) {
                     Text("Browse...")
-                }
+                }.disabled(fileViewModel.shouldCopyToClipboard)
                 Spacer()
             }
             HStack {
-                Text("File name").frame(width: 90, alignment: .leading)
-                HighlightTextField(text: $fileViewModel.fileName)
+                Text("File name").frame(width: 90, alignment: .leading).disabled(fileViewModel.shouldCopyToClipboard)
+                HighlightTextField(text: $fileViewModel.fileName).disabled(fileViewModel.shouldCopyToClipboard)
                 Spacer()
             }
         }.padding().frame(width: 400)

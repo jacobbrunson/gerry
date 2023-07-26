@@ -14,6 +14,7 @@ struct FileQualityView: View {
         let cropRect = saveWindowViewModel.cropRect
         let resolution = cropRect == nil ? nil : CGSize(width: cropRect!.width, height: cropRect!.height)
         return VStack {
+            Spacer()
             HStack {
                 Picker(selection: $fileViewModel.frameRate, label: Text("Frame rate").frame(width: 70)) {
                     Text("60 FPS (mp4 only)").tag(60)

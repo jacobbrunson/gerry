@@ -22,7 +22,9 @@ extension FileView {
         }
 
         func regenerateDefaultFileName() {
-            defaultFileName = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
+            DispatchQueue.main.async {
+                self.defaultFileName = "Gerry-" + UUID().uuidString.split(separator: "-")[0]
+            }
         }
 
         // Frame rate
@@ -72,6 +74,15 @@ extension FileView {
         var outputFolderPath: String {
             get { outputFolder == nil ? "" : friendlyPath(for: outputFolder!)}
             set { }
+        }
+        
+        @Published private var _shouldCopyToClipboard = (UserDefaults.standard.value(forKey: "shouldCopyToClipboard") as? Bool) ?? false;
+        var shouldCopyToClipboard: Bool {
+            get { _shouldCopyToClipboard }
+            set {
+                _shouldCopyToClipboard = newValue
+                UserDefaults.standard.set(newValue, forKey: "shouldCopyToClipboard")
+            }
         }
         
         private static let pathNames: [FileManager.SearchPathDirectory: String] = [

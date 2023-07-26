@@ -4,11 +4,17 @@
 
 import Foundation
 import AVFoundation
+import AppKit
 
 class GifExporter: Exporter {
     func getUrl(forOutputFolder outputFolder: URL, withFileName fileName: String) -> URL {
         outputFolder.appendingPathComponent(fileName).appendingPathExtension("gif")
     }
+    
+    var timer: Timer?
+    var actualProgress = 0.0
+    var desiredProgress = 0.0
+    var framesProcessed = 0
 
     func export(
             videoAt url: URL,
@@ -72,57 +78,48 @@ class GifExporter: Exporter {
         CGImageDestinationSetProperties(imageDestination, fileProperties as CFDictionary)
 
         print("Converting to gif...")
-        var framesProcessed = 0
+        self.framesProcessed = 0
         let startTime = CFAbsoluteTimeGetCurrent()
 
-        var actualProgress = 0.0
-        var desiredProgress = 0.0
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
-            desiredProgress = framesProcessed == frameCount ? desiredProgress + (1 - desiredProgress) * 0.01 : CGFloat(framesProcessed) / CGFloat(frameCount) * 0.5
-            actualProgress += (desiredProgress - actualProgress) * 0.01
-            onProgress(actualProgress)
+        DispatchQueue.main.async {
+            self.actualProgress = 0.0
+            self.desiredProgress = 0.0
+            self.timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+                self.desiredProgress = self.framesProcessed == frameCount ? self.desiredProgress + (1 - self.desiredProgress) * 0.01 : CGFloat(self.framesProcessed) / CGFloat(frameCount) * 0.5
+                self.actualProgress += (self.desiredProgress - self.actualProgress) * 0.01
+                onProgress(self.actualProgress)
+            }
         }
+
 
         return try! await withCheckedThrowingContinuation { continuation in
             var prevFrame: CGImage?
             generator.generateCGImagesAsynchronously(forTimes: timeValues) { (requestedTime, resultingImage, actualTime, result, error) in
-                framesProcessed += 1
+                self.framesProcessed += 1
 
                 if resultingImage == nil {
-                    print("Frame", framesProcessed, "/", frameCount, "failed")
+                    print("Frame", self.framesProcessed, "/", frameCount, "failed")
                     if prevFrame != nil {
                         CGImageDestinationAddImage(imageDestination, prevFrame!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
                     }
                 } else {
-                    print("Processed frame \(framesProcessed)/\(frameCount) (\(startFrame)-\(endFrame), \(totalFrames) total)")
+                    print("Processed frame \(self.framesProcessed)/\(frameCount) (\(startFrame)-\(endFrame), \(totalFrames) total)")
                     CGImageDestinationAddImage(imageDestination, resultingImage!.cropping(to: scaledRect)!, frameProperties as CFDictionary)
                     prevFrame = resultingImage
                 }
 
-                if framesProcessed == frameCount {
+                if self.framesProcessed == frameCount {
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                    print("Done converting to gif. Processed: \(framesProcessed) in \(timeElapsed) s")
+                    print("Done converting to gif. Processed: \(self.framesProcessed) in \(timeElapsed) s")
                     print("Finalizing...")
 
                     let result = CGImageDestinationFinalize(imageDestination)
 
-                    timer.invalidate()
+                    self.timer?.invalidate()
                     onProgress(1)
-
-                    let outputURL = self.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
-
-                    let usingSecurityScope = outputFolder.startAccessingSecurityScopedResource()
                     
-                    try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
-                    try? FileManager.default.removeItem(at: outputURL);
-                    try! FileManager.default.moveItem(at: tempURL, to: outputURL)
-
-                    if usingSecurityScope {
-                        outputFolder.stopAccessingSecurityScopedResource()
-                    }
-
                     if result {
-                        continuation.resume(returning: outputURL)
+                        continuation.resume(returning: tempURL)
                     } else {
                         print("Gif export failed")
                         continuation.resume(throwing: ExportError.failed)

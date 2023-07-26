@@ -9,6 +9,8 @@ class Mp4Exporter: Exporter {
     func getUrl(forOutputFolder outputFolder: URL, withFileName fileName: String) -> URL {
         outputFolder.appendingPathComponent(fileName).appendingPathExtension("mp4")
     }
+    
+    var timer: Timer?
 
     func export(
             videoAt url: URL,
@@ -48,8 +50,7 @@ class Mp4Exporter: Exporter {
         instruction.layerInstructions = [transformer]
         videoComposition.instructions = [instruction]
         
-//        try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
-        let outputURL = getUrl(forOutputFolder: outputFolder, withFileName: fileName)
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).appendingPathExtension("mp4")
 
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)!
         exportSession.videoComposition = videoComposition
@@ -57,19 +58,21 @@ class Mp4Exporter: Exporter {
                 start: CMTime(seconds: assetDuration.seconds * startT, preferredTimescale: Int32(NSEC_PER_SEC)),
                 end: CMTime(seconds: assetDuration.seconds * endT, preferredTimescale: Int32(NSEC_PER_SEC))
         )
-        exportSession.outputURL = outputURL
+        exportSession.outputURL = tempURL
         exportSession.outputFileType = .mp4
-
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            onProgress(CGFloat(exportSession.progress))
+        
+        
+        DispatchQueue.main.async {
+            self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                onProgress(CGFloat(exportSession.progress))
+            }
         }
 
         return await withCheckedContinuation { continuation in
             exportSession.exportAsynchronously {
-                print("done exporting mp4!")
-                timer.invalidate()
+                self.timer?.invalidate()
                 onProgress(1)
-                continuation.resume(returning: outputURL)
+                continuation.resume(returning: tempURL)
             }
         }
 

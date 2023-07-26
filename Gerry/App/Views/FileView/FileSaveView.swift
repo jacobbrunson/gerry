@@ -16,44 +16,48 @@ struct FileSaveView: View {
         let outputFolder = fileViewModel.outputFolder!
         let fileName = fileViewModel.fileName
         let outputURL = exporter.getUrl(forOutputFolder: outputFolder, withFileName: fileName)
-
-        let fileExists = FileManager.default.fileExists(atPath: outputURL.path)
-
-
-        if fileExists {
-            let fileExistsAction = UserDefaults.standard.value(forKey: "fileExistsAction") as? String
-
-            if fileExistsAction == "cancel" {
-                saveWindowViewModel.saveProgress = nil
-                return
-            }
-
-            if fileExistsAction == nil {
-                let alert = NSAlert()
-                alert.messageText = "Overwrite file?"
-                alert.informativeText = "A file named \"\(outputURL.lastPathComponent)\" already exists. Would you like to replace it?"
-                alert.addButton(withTitle: "Cancel")
-                alert.addButton(withTitle: "Overwrite")
-                alert.alertStyle = .critical
-                alert.showsSuppressionButton = true
-
-                let shouldCancel = alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
-
-                if alert.suppressionButton?.state.rawValue == 1 {
-                    UserDefaults.standard.set(shouldCancel ? "cancel" : "overwrite", forKey: "fileExistsAction")
-                }
-
-                if shouldCancel  {
+        
+        
+        if !fileViewModel.shouldCopyToClipboard {
+            
+            let fileExists = FileManager.default.fileExists(atPath: outputURL.path)
+            
+            
+            if fileExists {
+                let fileExistsAction = UserDefaults.standard.value(forKey: "fileExistsAction") as? String
+                
+                if fileExistsAction == "cancel" {
                     saveWindowViewModel.saveProgress = nil
                     return
                 }
+                
+                if fileExistsAction == nil {
+                    let alert = NSAlert()
+                    alert.messageText = "Overwrite file?"
+                    alert.informativeText = "A file named \"\(outputURL.lastPathComponent)\" already exists. Would you like to replace it?"
+                    alert.addButton(withTitle: "Cancel")
+                    alert.addButton(withTitle: "Overwrite")
+                    alert.alertStyle = .critical
+                    alert.showsSuppressionButton = true
+                    
+                    let shouldCancel = alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+                    
+                    if alert.suppressionButton?.state.rawValue == 1 {
+                        UserDefaults.standard.set(shouldCancel ? "cancel" : "overwrite", forKey: "fileExistsAction")
+                    }
+                    
+                    if shouldCancel  {
+                        saveWindowViewModel.saveProgress = nil
+                        return
+                    }
+                }
             }
+            fileViewModel.regenerateDefaultFileName()
         }
 
         saveWindowViewModel.saveProgress = 0
-        fileViewModel.regenerateDefaultFileName()
 
-        let result = await exporter.export(
+        let tempURL = await exporter.export(
                 videoAt: saveWindowViewModel.assetURL,
                 toFolder: outputFolder,
                 withName: fileName,
@@ -62,52 +66,83 @@ struct FileSaveView: View {
                 endingAt: saveWindowViewModel.endT,
                 withScale: 1.0/fileViewModel.scaleDivisor,
                 withFrameRate: CGFloat(fileViewModel.frameRate),
-                onProgress: { if saveWindowViewModel.saveProgress != nil { saveWindowViewModel.saveProgress = $0 } }
+                onProgress: { progress in
+                    print("on progress")
+                    DispatchQueue.main.async {
+                        if saveWindowViewModel.saveProgress != nil {
+                            saveWindowViewModel.saveProgress = progress
+                        }
+                    }
+                }
         )
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in saveWindowViewModel.saveProgress = nil }
+        
+        if fileViewModel.shouldCopyToClipboard {
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setData(tempURL.dataRepresentation, forType: .fileURL)
+        } else {
+            let usingSecurityScope = outputFolder.startAccessingSecurityScopedResource()
+
+            try? FileManager.default.createDirectory(at: outputFolder, withIntermediateDirectories: true)
+            try? FileManager.default.removeItem(at: outputURL);
+            try! FileManager.default.moveItem(at: tempURL, to: outputURL)
+
+            if usingSecurityScope {
+                outputFolder.stopAccessingSecurityScopedResource()
+            }
+        }
+        
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in
+            DispatchQueue.main.async {
+                saveWindowViewModel.saveProgress = nil
+            }
+        }
         onExport()
-        print(result)
+        
     }
 
     var body: some View {
-        HStack {
-            Button(action: {
-                Task {
-                    await export(using: GifExporter())
-                }
-            }) {
-                if fileViewModel.frameRate > 30 {
-                    VStack {
-                        Text("gif").font(.title)
-                        Text("30 fps").font(.footnote)
+        VStack {
+            Spacer()
+            HStack {
+                Button(action: {
+                    Task {
+                        await export(using: GifExporter())
                     }
+                }) {
+                    if fileViewModel.frameRate > 30 {
+                        VStack {
+                            Text("gif").font(.title)
+                            Text("30 fps").font(.footnote)
+                        }
+                        .frame(width: 66, height: 48)
+                        .background(Color("Yellow"))
+                    } else {
+                        Text("gif").font(.title)
                             .frame(width: 66, height: 48)
                             .background(Color("Yellow"))
-                } else {
-                    Text("gif").font(.title)
-                            .frame(width: 66, height: 48)
-                            .background(Color("Yellow"))
-
+                        
+                    }
+                    
                 }
-
-            }
-                    .disabled(saveWindowViewModel.saveProgress != nil)
-                    .buttonStyle(PlainButtonStyle())
-                    .cornerRadius(10)
-                    .foregroundColor(Color("DarkText"))
-
-            Button(action: {
-                Task {
-                    await export(using: Mp4Exporter())
-                }
-            }) {
-                Text("mp4")
+                .disabled(saveWindowViewModel.saveProgress != nil)
+                .buttonStyle(PlainButtonStyle())
+                .cornerRadius(10)
+                .foregroundColor(Color("DarkText"))
+                
+                Button(action: {
+                    Task {
+                        await export(using: Mp4Exporter())
+                    }
+                }) {
+                    Text("mp4")
                         .font(.title)
                         .frame(width: 66, height: 48)
                         .background(Color("Yellow"))
                         .foregroundColor(Color("DarkText"))
                         .cornerRadius(10)
-            }.disabled(saveWindowViewModel.saveProgress != nil).buttonStyle(PlainButtonStyle())
-        }.padding()
+                }.disabled(saveWindowViewModel.saveProgress != nil).buttonStyle(PlainButtonStyle())
+            }.padding()
+        }
     }
 }

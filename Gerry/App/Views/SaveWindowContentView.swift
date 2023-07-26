@@ -31,7 +31,7 @@ struct SaveWindowContentView: View {
                 viewModel.player.seek(to: CMTime(seconds: viewModel.player.currentItem!.duration.seconds * t * 0.999999, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
                 viewModel.player.play()
             }).frame(height: 100)
-            ResponsiveLogoAndFile(viewModel: viewModel, onExport: onExport).frame(height: 100)
+            ResponsiveLogoAndFile(viewModel: viewModel, onExport: onExport).frame(height: 130)
         }.background(GerryBackground(material: NSVisualEffectView.Material.underWindowBackground, blendingMode: .behindWindow, isEmphasized: true))
     }
 }
@@ -44,13 +44,14 @@ struct ResponsiveLogoAndFile: View {
         GeometryReader { geometry in
             let availableWidth = geometry.frame(in: .local).width
             let image = Image("Gerry").resizable().padding(.leading, availableWidth >= 1500 ? 12 : 0)
-            let fileView = FileView(saveWindowViewModel: viewModel, onExport: onExport).frame(height: 100).frame(maxWidth: 900)
-
-            ZStack(alignment: .bottomLeading) {
+            let fileView = FileView(saveWindowViewModel: viewModel, onExport: onExport).frame(height: 130).frame(maxWidth: 900)
+            
+            
+            VStack(alignment: .leading) {
                 if availableWidth >= 1500 {
                     ZStack {
                         HStack {
-                            image.frame(width: 200, height: 75)
+                            image.frame(width: 267, height: 100).padding(.top, 30)
                             Spacer()
                         }
                         fileView
@@ -58,23 +59,25 @@ struct ResponsiveLogoAndFile: View {
                 } else if availableWidth >= 1100 {
                     HStack {
                         Spacer()
-                        image.frame(width: 200, height: 75)
+                        image.frame(width: 267, height: 100).padding(.top, 30)
                         fileView
                         Spacer()
-                    }
+                    }.frame(height: 100)
                 } else if availableWidth >= 750 {
                     let width = 200 * (availableWidth - 750) / 350
                     HStack {
-                        image.frame(width: width, height: width * 0.375).padding(.leading)
+                        image.frame(width: width, height: width * 0.375).padding(.leading).padding(.top, 30)
                         fileView
-                    }
+                    }.frame(height: 100)
                 } else {
                     fileView
                 }
                 if viewModel.saveProgress != nil {
-                    withAnimation(.easeOut) {
-                        Rectangle().fill(Color("Yellow")).frame(width: availableWidth * viewModel.saveProgress!, height: 4)
-                    }
+                    VStack {
+                        withAnimation(.easeOut) {
+                            Rectangle().fill(Color("Yellow")).frame(width: availableWidth * viewModel.saveProgress!, height: 4)
+                        }
+                    }.frame(height:34)
                 }
             }
 

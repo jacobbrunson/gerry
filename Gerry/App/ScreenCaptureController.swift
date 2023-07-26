@@ -31,7 +31,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
     }
 
     func stopRecording() async -> URL {
-        try! await stream!.stopCapture()
+        try! await stream?.stopCapture()
         await writer!.finishWriting()
         hasSession = false
         return writer!.outputURL
@@ -46,11 +46,18 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         if !hasSession {
             writer!.startSession(atSourceTime: CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
         }
+        
+        let attachmentses = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer,
+                createIfNecessary: false) as? [[SCStreamFrameInfo: Any]]
+        let attachments = attachmentses?.first
+        let status = attachments?[.status]
+        
 
-        if input!.isReadyForMoreMediaData {
+        if let rawStatus = status as? Int,
+           let status = SCFrameStatus(rawValue: rawStatus),
+                status == .complete,
+                input!.isReadyForMoreMediaData  {
             input!.append(sampleBuffer)
-        } else {
-            print("Skipping frame because input is not ready")
         }
     }
 
@@ -58,12 +65,16 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         let directory = FileManager.default.temporaryDirectory
         let fileName = NSUUID().uuidString
         let outputURL = directory.appendingPathComponent(fileName).appendingPathExtension("mp4")
-
-        writer = try! AVAssetWriter(outputURL: outputURL, fileType: .mp4);
+        print(width, height, fileName, outputURL)
+        writer = try! AVAssetWriter(outputURL: outputURL, fileType: .mov);
         let outputSettings = [AVVideoCodecKey: AVVideoCodecType.h264,
                               AVVideoWidthKey: NSNumber(value: width),
                               AVVideoHeightKey: NSNumber(value: height)] as [String : Any]
         input = AVAssetWriterInput(mediaType: .video, outputSettings: outputSettings)
+        input?.expectsMediaDataInRealTime = true;
+        
+//        input.sam
+        
 
         writer!.add(input!);
         writer!.startWriting()
@@ -97,11 +108,14 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         guard let attachmentses = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer,
                 createIfNecessary: false) as? [[SCStreamFrameInfo: Any]],
               let attachments = attachmentses.first, let contentRectDict = attachments[.contentRect],
-              let contentRect = CGRect(dictionaryRepresentation: contentRectDict as! CFDictionary)
+              let contentRect = CGRect(dictionaryRepresentation: contentRectDict as! CFDictionary),
+              let status = attachments[.status],
+              let idk = attachments[.contentScale],
+              let idk2 = attachments[.displayTime]
         else {
             return (0, 0)
         }
-
+        print(contentRect, status, idk, idk2)
         return (contentRect.width, contentRect.height)
     }
 }
