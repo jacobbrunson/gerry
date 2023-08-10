@@ -23,10 +23,16 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
     private var clickListener: GlobalMouseListener?
 
     private var hasSession = false
+    private var isRecording = false
     
     private var isWarm = false
 
     func beginRecording() async -> Bool {
+        if isRecording {
+            return true
+        }
+        isRecording = true
+        
         if clickListener == nil {
             clickListener = GlobalMouseListener(handler: { event in
                 if event?.type == .leftMouseDown {
@@ -71,6 +77,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         clickListener?.stop()
         await writer!.finishWriting()
         hasSession = false
+        isRecording = false
         return writer!.outputURL
     }
 
