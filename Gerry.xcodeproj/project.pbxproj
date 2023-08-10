@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		16A9E29A2896FF2E00A71C00 /* SaveWindowContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */; };
 		16F50BAD289A309A0006576D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F50BAC289A309A0006576D /* CoreGraphics.framework */; };
 		16F50BAF289A30B70006576D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F50BAE289A30B70006576D /* AVFoundation.framework */; };
+		16FD22D12A7FDA730051F38D /* GlobalMouseListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FD22D02A7FDA730051F38D /* GlobalMouseListener.swift */; };
 		6035415DF2831919A455D271 /* ThumbnailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6035481EE67C7F7CAFE31BA6 /* ThumbnailController.swift */; };
 		603542251AFD97CEB24C77F9 /* VertexCropHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603546C2361A09FCC2501462 /* VertexCropHandle.swift */; };
 		603542C92AFE698947A5B04C /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60354E933ADC961B34692731 /* Exporter.swift */; };
@@ -52,6 +53,7 @@
 		16A9E2992896FF2E00A71C00 /* SaveWindowContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveWindowContentViewModel.swift; sourceTree = "<group>"; };
 		16F50BAC289A309A0006576D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		16F50BAE289A30B70006576D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		16FD22D02A7FDA730051F38D /* GlobalMouseListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMouseListener.swift; sourceTree = "<group>"; };
 		603540C3D545D8773CA98C11 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		6035416FE85A902E9C3C5EE7 /* Gerry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gerry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6035417E35D2CF1C3940C8D3 /* GerryWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GerryWindow.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 		603542117ADE8735D10146E8 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				16FD22D02A7FDA730051F38D /* GlobalMouseListener.swift */,
 				6035424823C715217ACA27F1 /* StatusBarController.swift */,
 				60354C3EAA4D110F7AAA9978 /* ScreenCaptureController.swift */,
 				60354C6487C42E19037BD157 /* GerryController.swift */,
@@ -256,7 +259,8 @@
 		60354E0B8333DA5E38F1E7BA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1340;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					60354B52FFFD8E47EBF2A05A = {
 						DevelopmentTeam = HXF8F8539G;
@@ -266,10 +270,9 @@
 			};
 			buildConfigurationList = 60354CE6103E4A268DB0EC17 /* Build configuration list for PBXProject "Gerry" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -323,6 +326,7 @@
 				60354BE5F8A03DD95452F9F1 /* PlayheadView.swift in Sources */,
 				60354EFBB11110D474E35134 /* TrimmerHandleView.swift in Sources */,
 				60354CCA34D10FD907904FD8 /* TimelineView.swift in Sources */,
+				16FD22D12A7FDA730051F38D /* GlobalMouseListener.swift in Sources */,
 				603542C92AFE698947A5B04C /* Exporter.swift in Sources */,
 				60354E38985F81E1744B895B /* GifExporter.swift in Sources */,
 				16A9E2982896FF0400A71C00 /* SaveWindowContentView.swift in Sources */,
@@ -342,9 +346,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Gerry/Gerry.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 13;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HXF8F8539G;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -353,9 +359,12 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = video.gerry.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -398,6 +407,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -414,7 +424,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -451,6 +462,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -486,9 +498,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Gerry/Gerry.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 13;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HXF8F8539G;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -497,9 +511,12 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainNibFile = MainMenu;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_BUNDLE_IDENTIFIER = video.gerry.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";

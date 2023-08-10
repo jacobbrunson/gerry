@@ -15,19 +15,32 @@ class GerryController {
 
     var unsavedVideos: Set<URL> = []
 
-    var windowControllers: Set<NSWindowController> = []
-
+    var windowControllers: [URL:NSWindowController] = [:]
+    
+    
     init() {
         if !CGPreflightScreenCaptureAccess() {
             CGRequestScreenCaptureAccess()
+        } else {
+            statusBarController.hasPermission = true
         }
         NSApp.setActivationPolicy(.accessory)
-
+        
+        
         statusBarController.onRecord = { [unowned self] in
             Task {
                 await openWindowsDialog()
-                statusBarController.isRecording = true
-                await screenCaptureController.beginRecording()
+                if await screenCaptureController.beginRecording() {
+                    statusBarController.isRecording = true
+                } else {
+                    statusBarController.isRecording = false
+                    statusBarController.hasPermission = false
+                    // Handles case where permission is revoked while app is running
+                    // Also handles other unexpected failures? Might wanna handle those separately later
+                    DispatchQueue.main.async {
+                        permissionHelp()
+                    }
+                }
             }
         }
 
@@ -50,10 +63,13 @@ class GerryController {
                 let display = await self.screenCaptureController.getDisplay()
                 let view = SaveWindowContentView(assetURL: videoURL, onExport: { [weak self] in
                     self?.unsavedVideos.remove(videoURL)
+                    if UserDefaults.standard.value(forKey: "autoClose") as? Bool == true {
+                        self?.windowControllers[videoURL]?.close()
+                    }
                 })
                 let windowController = view.openNewWindow(title: "Gerry - Save", contentRect: CGRect(x: 0, y: 0, width: display.width, height: display.height))
                 self.openWindows += 1
-                self.windowControllers.insert(windowController)
+                self.windowControllers[videoURL] = windowController
                 self.unsavedVideos.insert(videoURL)
                 windowController.shouldClose = { [weak self] windowController in
                     guard let unsavedVideos = self?.unsavedVideos else { return true }
@@ -65,7 +81,7 @@ class GerryController {
                 }
                 windowController.onClose = { [weak self] windowController in
                     guard self != nil else { return }
-                    self!.windowControllers.remove(windowController)
+                    self!.windowControllers.removeValue(forKey: videoURL)
                     self!.openWindows -= 1
                     self!.unsavedVideos.remove(videoURL)
                     if self!.openWindows == 0 {

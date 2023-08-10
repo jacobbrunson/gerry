@@ -11,6 +11,8 @@ class StatusBarController {
     public var onOpen: ((_ url: URL) -> ())?
     public var onRecord: (() -> ())?
     public var onStop: (() -> ())?
+    
+    public var hasPermission = false
 
     private var _isRecording = false
     public var isRecording: Bool {
@@ -53,8 +55,13 @@ class StatusBarController {
         }
 
         if isPrimaryButton {
-            guard onRecord != nil, statusItem.menu == nil else { return }
-            onRecord!()
+            if hasPermission {
+                guard onRecord != nil, statusItem.menu == nil else { return }
+                onRecord!()
+            } else {
+                // One-click recording is enabled, but they didn't give permission
+                permissionHelp()
+            }
         } else {
             constructMenu()
             statusItem.button?.performClick(nil)
@@ -80,9 +87,15 @@ class StatusBarController {
 
         statusItem.menu = menu
         
-        let recordItem = NSMenuItem(title: "Start recording", action: #selector(GerryMenu.recordVideo), keyEquivalent: "r")
-        recordItem.target = menu
-        menu.addItem(recordItem)
+        if hasPermission {
+            let recordItem = NSMenuItem(title: "Start recording", action: #selector(GerryMenu.recordVideo), keyEquivalent: "r")
+            recordItem.target = menu
+            menu.addItem(recordItem)
+        } else {
+            let permissionItem = NSMenuItem(title: "Allow Gerry to record your screen...", action: #selector(GerryMenu._permissionHelp), keyEquivalent: "")
+            permissionItem.target = menu
+            menu.addItem(permissionItem)
+        }
 
         menu.addItem(NSMenuItem.separator())
 
@@ -110,6 +123,17 @@ class StatusBarController {
                     return shouldEnable
                 }
         ))
+        menu.addItem(PreferenceMenuItem(
+            title: "Highlight mouse clicks",
+            preferenceKey: "highlightClicks",
+            isBoolean: true,
+            onEnable: { true }
+        ))
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        menu.addItem(PreferenceMenuItem(title: "Auto-close window after exporting", preferenceKey: "autoClose", isBoolean: true, onEnable: { true }))
+        
         menu.addItem(PreferenceMenuItem(
                 title: "Show \"unsaved video\" warnings",
                 preferenceKey: "unsavedVideoAction"
@@ -193,6 +217,10 @@ class GerryMenu: NSMenu, NSMenuDelegate {
     @objc func recordVideo() {
         onRecord?()
     }
+    
+    @objc func _permissionHelp() {
+        permissionHelp()
+    }
 
     @MainActor
     func selectFile() async -> URL {
@@ -214,4 +242,16 @@ class GerryMenu: NSMenu, NSMenuDelegate {
             }
         }
     }
+}
+
+func permissionHelp() {
+    let alert = NSAlert()
+    alert.messageText = "Gerry needs permission to record your screen"
+    alert.informativeText = "You may grant permission to Gerry by enabling the option in System Settings > Privacy & Security > Screen recording and then restarting the app."
+    alert.addButton(withTitle: "Ok")
+    
+    NSApp.setActivationPolicy(.regular)
+    NSApp.activate(ignoringOtherApps: true)
+    
+    alert.runModal()
 }

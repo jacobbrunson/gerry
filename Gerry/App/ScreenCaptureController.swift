@@ -5,6 +5,7 @@
 import Foundation
 import ScreenCaptureKit
 import AVFoundation
+import SwiftUI
 
 class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
 
@@ -14,24 +15,60 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
 
     private var writer: AVAssetWriter?
     private var input: AVAssetWriterInput?
+    private var adapter: AVAssetWriterInputPixelBufferAdaptor?
+    private var ciContext: CIContext?
+    
+    private var mouseIsDown = false
+    private var mouseLocation = CGPoint()
+    private var clickListener: GlobalMouseListener?
+
     private var hasSession = false
+    
+    private var isWarm = false
 
-    func beginRecording() async {
-        let content = try! await SCShareableContent.excludingDesktopWindows(false,
-                onScreenWindowsOnly: false)
-        let display = content.displays.first!
-        let filter = getFilter(display: display, availableApps: content.applications)
-        let configuration = getConfiguration(display)
-
-        beginWriting(width: display.width * scale, height: display.height * scale)
-
-        stream = SCStream(filter: filter, configuration: configuration, delegate: self)
-        try! stream!.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleHandlerQueue)
-        try! await stream!.startCapture()
+    func beginRecording() async -> Bool {
+        if clickListener == nil {
+            clickListener = GlobalMouseListener(handler: { event in
+                if event?.type == .leftMouseDown {
+                    self.mouseIsDown = true
+                } else if event?.type == .leftMouseUp {
+                    self.mouseIsDown = false
+                }
+                self.mouseLocation = event!.locationInWindow
+            })
+        }
+        
+        if ciContext == nil {
+            ciContext = CIContext()
+        }
+        
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(false,
+                                                                               onScreenWindowsOnly: false)
+            
+            let display = content.displays.first!
+            let filter = getFilter(display: display, availableApps: content.applications)
+            let configuration = getConfiguration(display)
+            
+            beginWriting(width: display.width * scale, height: display.height * scale)
+            
+            stream = SCStream(filter: filter, configuration: configuration, delegate: self)
+            try stream?.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleHandlerQueue)
+            try await stream?.startCapture()
+                
+            if UserDefaults.standard.value(forKey: "highlightClicks") as? Bool == true {
+                clickListener?.start()
+            }
+            
+            return stream != nil
+        } catch {
+            return false
+        }
     }
 
     func stopRecording() async -> URL {
         try! await stream?.stopCapture()
+        clickListener?.stop()
         await writer!.finishWriting()
         hasSession = false
         return writer!.outputURL
@@ -56,8 +93,22 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         if let rawStatus = status as? Int,
            let status = SCFrameStatus(rawValue: rawStatus),
                 status == .complete,
-                input!.isReadyForMoreMediaData  {
-            input!.append(sampleBuffer)
+           input!.isReadyForMoreMediaData  {
+            
+            
+            if mouseIsDown || !isWarm {
+                isWarm = true
+                
+                let image = CIImage(cvImageBuffer: sampleBuffer.imageBuffer!)
+                
+                let scale = NSScreen.main?.backingScaleFactor ?? 1.0
+                let newImage = image.overlayCircle(center: CGPoint(x: mouseLocation.x * scale, y: mouseLocation.y * scale), radius: 50.0, outlineWidth: 8.0, color: CIColor(color: NSColor(Color("Yellow")))!)
+                ciContext!.render(newImage!, to: image.pixelBuffer!)
+                
+                adapter!.append(image.pixelBuffer!, withPresentationTime: sampleBuffer.presentationTimeStamp)
+            } else {
+                input!.append(sampleBuffer)
+            }
         }
     }
 
@@ -73,7 +124,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         input = AVAssetWriterInput(mediaType: .video, outputSettings: outputSettings)
         input?.expectsMediaDataInRealTime = true;
         
-//        input.sam
+        self.adapter = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input!)
         
 
         writer!.add(input!);
@@ -117,5 +168,41 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         }
         print(contentRect, status, idk, idk2)
         return (contentRect.width, contentRect.height)
+    }
+}
+
+
+extension CIImage {
+    func overlayCircle(center: CGPoint, radius: CGFloat, outlineWidth: CGFloat, color: CIColor) -> CIImage? {
+         let innerRadius = radius - outlineWidth
+         let outerRadius = radius
+
+         // Outer circle
+         let outerGradient = CIFilter(name: "CIRadialGradient",
+                                     parameters: ["inputRadius0": outerRadius - 1,
+                                                  "inputRadius1": outerRadius,
+                                                  "inputColor0": color,
+                                                  "inputColor1": CIColor.clear,
+                                                  "inputCenter": CIVector(x: center.x, y: center.y)])?.outputImage
+
+         // Inner circle
+         let innerGradient = CIFilter(name: "CIRadialGradient",
+                                     parameters: ["inputRadius0": innerRadius - 1,
+                                                  "inputRadius1": innerRadius,
+                                                  "inputColor0": color,
+                                                  "inputColor1": CIColor.clear,
+                                                  "inputCenter": CIVector(x: center.x, y: center.y)])?.outputImage
+
+         // Subtract the inner circle from the outer circle to create the outline
+         let subtractFilter = CIFilter(name: "CISubtractBlendMode",
+                                      parameters: ["inputImage": outerGradient!,
+                                                   "inputBackgroundImage": innerGradient!])?.outputImage
+
+        
+        // Composite on top of screen recording
+        let compositeFilter = CIFilter(name: "CIScreenBlendMode", parameters: ["inputImage": subtractFilter!, "inputBackgroundImage": self])?.outputImage
+        
+
+        return compositeFilter
     }
 }
