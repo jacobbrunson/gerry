@@ -733,7 +733,7 @@
           setTimeout(() => {
             elements.forEach((el) => container.removeChild(el));
             activateStage((i + 1) % stages.length);
-          }, 4000);
+          }, 3000);
           // }
         };
 
@@ -741,7 +741,7 @@
 
         const render = (T) => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          const t = (T - stageStartT) / 4000;
+          const t = (T - stageStartT) / 3000;
           currentStage.render && currentStage.render(T, t, ctx);
           // waves.forEach((wave, i) => wave.render(t, ctx));
           // if (t < 3000) {
