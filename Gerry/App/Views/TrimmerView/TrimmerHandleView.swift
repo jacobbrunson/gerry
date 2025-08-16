@@ -16,6 +16,7 @@ class TrimmerHandleView: NSView {
     var position: TrimmerHandlePosition = .left
     var t: CGFloat = 0
     var onUpdate: (CGFloat) -> () = { _ in }
+    var setPaused: (Bool) -> () = { _ in }
 
     var widthT: CGFloat {
         superview == nil ? 0 : TrimmerHandleView.width / superview!.frame.width
@@ -34,6 +35,16 @@ class TrimmerHandleView: NSView {
         context.setFillColor(CGColor(red: 1, green: 0.8, blue: 0, alpha: 1))
         context.drawPath(using: .fill)
         context.restoreGState()
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        setPaused(true)
+        onUpdate(t)
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        setPaused(false)
+        onUpdate(t)
     }
 
     override func mouseDragged(with event: NSEvent) {

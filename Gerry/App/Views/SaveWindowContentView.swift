@@ -29,7 +29,12 @@ struct SaveWindowContentView: View {
                     viewModel.endT = t
                 }
                 viewModel.player.seek(to: CMTime(seconds: viewModel.player.currentItem!.duration.seconds * t * 0.999999, preferredTimescale: 10000), toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
-                viewModel.player.play()
+            }, setPaused: { paused in
+                if paused {
+                    viewModel.player.pause()
+                } else {
+                    viewModel.player.play()
+                }
             }).frame(height: 100)
             ResponsiveLogoAndFile(viewModel: viewModel, onExport: onExport).frame(height: 130)
         }.background(GerryBackground(material: NSVisualEffectView.Material.underWindowBackground, blendingMode: .behindWindow, isEmphasized: true))

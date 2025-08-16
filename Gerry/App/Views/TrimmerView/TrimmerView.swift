@@ -11,10 +11,12 @@ struct TrimmerView: NSViewControllerRepresentable {
     @ObservedObject var viewModel: SaveWindowContentView.ViewModel
 
     let onUpdate: (CGFloat, TrimmerHandlePosition) -> ()
+    let setPaused: (Bool) -> ()
 
-    init(viewModel: SaveWindowContentView.ViewModel, onUpdate: @escaping (CGFloat, TrimmerHandlePosition) -> ()) {
+    init(viewModel: SaveWindowContentView.ViewModel, onUpdate: @escaping (CGFloat, TrimmerHandlePosition) -> (), setPaused: @escaping (Bool) -> ()) {
         self.viewModel = viewModel
         self.onUpdate = onUpdate
+        self.setPaused = setPaused
     }
 
     func makeNSViewController(context: Context) -> TrimmerViewController {
@@ -23,6 +25,7 @@ struct TrimmerView: NSViewControllerRepresentable {
         viewController.cropRect = viewModel.cropRect
         viewController.player = viewModel.player
         viewController.onUpdate = onUpdate
+        viewController.setPaused = setPaused
         return viewController
     }
 
@@ -38,6 +41,7 @@ class TrimmerViewController: NSViewController {
     let playheadView = PlayheadView()
     var mediaURL = URL(string: "/")!
     var onUpdate: ((CGFloat, TrimmerHandlePosition) -> ())?
+    var setPaused: ((Bool) -> ())?
     var asset: AVAsset?
     var thumbnailController: ThumbnailController?
     var hasRequestedThumbnails = false
@@ -74,9 +78,15 @@ class TrimmerViewController: NSViewController {
                                 to: CMTime(seconds: startTime, preferredTimescale: 1000),
                                 toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero
                         )
+                        player.play()
                     }
-                    player.play()
-
+                    
+                    // For some reason playback sometimes stops when moving back to the start? Not sure why, but this fixes it.
+                    // Probably need to switch this whole system to AVPlayerLooper
+                    if currentTime <= startTime && player.timeControlStatus != .paused {
+                        player.play()
+                    }
+                    
                     playheadView.setNeedsDisplay(timelineView.frame)
                 }
 
@@ -90,6 +100,7 @@ class TrimmerViewController: NSViewController {
             }
             self?.onUpdate?(t, .left)
         }
+        leftHandleView.setPaused = self.setPaused!
 
         rightHandleView.t = 1
         rightHandleView.position = .right
@@ -101,6 +112,7 @@ class TrimmerViewController: NSViewController {
             }
             self?.onUpdate?(t, .right)
         }
+        rightHandleView.setPaused = self.setPaused!
 
         timelineView.leftHandleView = leftHandleView
         timelineView.rightHandleView = rightHandleView
