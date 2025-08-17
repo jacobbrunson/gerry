@@ -19,6 +19,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
     private var ciContext: CIContext?
     
     private var mouseIsDown = false
+    private var mouseWasDown = false
     private var mouseLocation = CGPoint()
     private var clickListener: GlobalMouseListener?
 
@@ -37,13 +38,14 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
             clickListener = GlobalMouseListener(handler: { event in
                 if event?.type == .leftMouseDown {
                     self.mouseIsDown = true
+                    self.mouseWasDown = true
                 } else if event?.type == .leftMouseUp {
                     self.mouseIsDown = false
                 }
                 self.mouseLocation = event!.locationInWindow
             })
         }
-        
+
         if ciContext == nil {
             ciContext = CIContext()
         }
@@ -103,15 +105,16 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
            input!.isReadyForMoreMediaData  {
             
             
-            if mouseIsDown || !isWarm {
+            if mouseWasDown || !isWarm {
+                mouseWasDown = mouseIsDown
                 isWarm = true
-                
+
                 let image = CIImage(cvImageBuffer: sampleBuffer.imageBuffer!)
-                
+
                 let scale = NSScreen.main?.backingScaleFactor ?? 1.0
                 let newImage = image.overlayCircle(center: CGPoint(x: mouseLocation.x * scale, y: mouseLocation.y * scale), radius: 50.0, outlineWidth: 8.0, color: CIColor(color: NSColor(Color("Yellow")))!)
                 ciContext!.render(newImage!, to: image.pixelBuffer!)
-                
+
                 adapter!.append(image.pixelBuffer!, withPresentationTime: sampleBuffer.presentationTimeStamp)
             } else {
                 input!.append(sampleBuffer)
@@ -123,7 +126,7 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         let directory = FileManager.default.temporaryDirectory
         let fileName = NSUUID().uuidString
         let outputURL = directory.appendingPathComponent(fileName).appendingPathExtension("mp4")
-        print(width, height, fileName, outputURL)
+
         writer = try! AVAssetWriter(outputURL: outputURL, fileType: .mov);
         let outputSettings = [AVVideoCodecKey: AVVideoCodecType.h264,
                               AVVideoWidthKey: NSNumber(value: width),
@@ -132,7 +135,6 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         input?.expectsMediaDataInRealTime = true;
         
         self.adapter = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input!)
-        
 
         writer!.add(input!);
         writer!.startWriting()
@@ -166,14 +168,11 @@ class ScreenCaptureController: NSObject, SCStreamDelegate, SCStreamOutput {
         guard let attachmentses = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer,
                 createIfNecessary: false) as? [[SCStreamFrameInfo: Any]],
               let attachments = attachmentses.first, let contentRectDict = attachments[.contentRect],
-              let contentRect = CGRect(dictionaryRepresentation: contentRectDict as! CFDictionary),
-              let status = attachments[.status],
-              let idk = attachments[.contentScale],
-              let idk2 = attachments[.displayTime]
+              let contentRect = CGRect(dictionaryRepresentation: contentRectDict as! CFDictionary)
         else {
             return (0, 0)
         }
-        print(contentRect, status, idk, idk2)
+
         return (contentRect.width, contentRect.height)
     }
 }

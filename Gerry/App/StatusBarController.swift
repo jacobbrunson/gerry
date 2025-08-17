@@ -123,13 +123,14 @@ class StatusBarController {
                     return shouldEnable
                 }
         ))
+        
         menu.addItem(PreferenceMenuItem(
             title: "Highlight mouse clicks",
             preferenceKey: "highlightClicks",
             isBoolean: true,
             onEnable: { true }
         ))
-        
+
         menu.addItem(NSMenuItem.separator())
         
         menu.addItem(PreferenceMenuItem(title: "Auto-close window after exporting", preferenceKey: "autoClose", isBoolean: true, onEnable: { true }))
