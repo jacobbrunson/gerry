@@ -27,21 +27,23 @@ class TimelineView: NSView {
 
         context.saveGState()
         context.clear(CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
-
-        leftHandleView?.draw(dirtyRect)
-        playheadView?.draw(dirtyRect)
-
+        
         // Background
         context.addRect(CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
         context.setFillColor(CGColor(red: 0, green: 0, blue: 0, alpha: 1))
         context.drawPath(using: .fill)
-
+        
+        playheadView?.draw(dirtyRect)
+        
         // Thumbnails
         for (i, thumb) in thumbs.enumerated() {
             let width = frame.width / CGFloat(thumbs.count)
             let rect = CGRect(x: Int(CGFloat(i) * width), y: 0, width: thumb.width, height: thumb.height)
             context.draw(thumb, in: rect)
         }
+        
+        leftHandleView?.draw(dirtyRect)
+        rightHandleView?.draw(dirtyRect)
 
         // Top/bottom selection borders
         let thickness = 4.0
@@ -54,14 +56,13 @@ class TimelineView: NSView {
         context.setFillColor(CGColor(red: 1, green: 0.8, blue: 0, alpha: 1))
         context.drawPath(using: .fill)
 
-        rightHandleView?.draw(dirtyRect)
 
         // Dark overlays
         context.addRect(CGRect(x: 0, y: 0, width: leftHandleView!.frame.minX, height: frame.height ))
         context.addRect(CGRect(x: rightHandleView!.frame.maxX, y: 0, width: frame.width - rightHandleView!.frame.maxX, height: frame.height ))
         context.setFillColor(CGColor(red: 0, green: 0, blue: 0, alpha: 0.5))
         context.drawPath(using: .fill)
-
+        
         context.restoreGState()
     }
 }
